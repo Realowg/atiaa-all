@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f4ee;
-  --foreground: #171717;
-  --ivory-50: #fbfaf7;
-  --ivory-100: #f2efe7;
-  --ivory-200: #e8e2d6;
-  --ink-700: #4e5057;
-  --ink-900: #232529;
-  --ink-950: #171717;
-  --navy-700: #365275;
-  --navy-900: #213854;
-  --navy-950: #16283c;
-  --saffron-400: #d5a75a;
-  --saffron-500: #ba8e49;
+  --background: #f6f5ef;
+  --foreground: #111111;
+  --ivory-50: #fbfaf6;
+  --ivory-100: #f1f0ea;
+  --ivory-200: #e6e4dc;
+  --ink-700: #666660;
+  --ink-900: #262622;
+  --ink-950: #111111;
+  --navy-700: #5f5f5a;
+  --navy-900: #2a2a27;
+  --navy-950: #141414;
+  --saffron-400: #8e8e88;
+  --saffron-500: #6f6f69;
 }
 
 @theme inline {
@@ -31,7 +31,7 @@
   --color-saffron-400: var(--saffron-400);
   --color-saffron-500: var(--saffron-500);
   --font-sans: var(--font-sans-ui);
-  --font-display: var(--font-fraunces);
+  --font-display: var(--font-sans-ui);
 }
 
 * {
@@ -59,7 +59,7 @@ textarea {
 }
 
 ::selection {
-  background: rgba(22, 40, 60, 0.14);
+  background: rgba(17, 17, 17, 0.14);
   color: var(--ink-950);
 }
 
@@ -67,13 +67,14 @@ textarea {
   content: "";
   position: fixed;
   inset: 0;
+  z-index: -1;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 18% 10%, rgba(22, 40, 60, 0.04), transparent 22%),
-    radial-gradient(circle at 88% 18%, rgba(186, 142, 73, 0.05), transparent 16%),
-    linear-gradient(rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0));
+    radial-gradient(circle at 20% 8%, rgba(17, 17, 17, 0.03), transparent 22%),
+    radial-gradient(circle at 84% 14%, rgba(17, 17, 17, 0.02), transparent 18%),
+    linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0));
   mix-blend-mode: normal;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 @media (prefers-reduced-motion: reduce) {

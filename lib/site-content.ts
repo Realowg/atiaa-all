@@ -54,6 +54,13 @@ export interface RoadmapPhase {
   description: string;
 }
 
+export interface ImageAsset {
+  src: string;
+  alt: string;
+  sourceUrl: string;
+  sourceLabel: string;
+}
+
 export interface HomeContent {
   brand: {
     name: string;
@@ -64,6 +71,12 @@ export interface HomeContent {
   };
   navItems: NavItem[];
   trustRoles: string[];
+  imagery: {
+    hero: ImageAsset;
+    why: ImageAsset;
+    programmes: ImageAsset;
+    projects: ImageAsset;
+  };
   heroPanel: {
     title: string;
     summary: string;
@@ -101,6 +114,32 @@ export const siteContent: Record<SiteLocale, HomeContent> = {
       { label: "Contact", href: "#contact" },
     ],
     trustRoles: ["Fondateurs", "Experts", "Entreprises", "Écoles", "Partenaires"],
+    imagery: {
+      hero: {
+        src: "/imagery/hero-collaboration.jpg",
+        alt: "Deux professionnels en discussion lors d’un événement de travail.",
+        sourceUrl: "https://unsplash.com/photos/KHQJf0Gq3RA",
+        sourceLabel: "Unsplash",
+      },
+      why: {
+        src: "/imagery/why-collaboration.jpg",
+        alt: "Deux femmes collaborant devant leurs ordinateurs portables.",
+        sourceUrl: "https://unsplash.com/photos/n_4iTY1KmDE",
+        sourceLabel: "Unsplash",
+      },
+      programmes: {
+        src: "/imagery/programmes-workshop.jpg",
+        alt: "Un formateur présentant devant un tableau à deux participants.",
+        sourceUrl: "https://unsplash.com/photos/CjYnf6YL0NY",
+        sourceLabel: "Unsplash",
+      },
+      projects: {
+        src: "/imagery/projects-collaboration.jpg",
+        alt: "Deux professionnels collaborant devant un ordinateur dans un atelier technique.",
+        sourceUrl: "https://unsplash.com/photos/kwzWjTnDPLk",
+        sourceLabel: "Unsplash",
+      },
+    },
     heroPanel: {
       title: "Vue d’ensemble ATIAA",
       summary:
@@ -322,6 +361,32 @@ export const siteContent: Record<SiteLocale, HomeContent> = {
     },
     navItems: [],
     trustRoles: [],
+    imagery: {
+      hero: {
+        src: "",
+        alt: "",
+        sourceUrl: "",
+        sourceLabel: "",
+      },
+      why: {
+        src: "",
+        alt: "",
+        sourceUrl: "",
+        sourceLabel: "",
+      },
+      programmes: {
+        src: "",
+        alt: "",
+        sourceUrl: "",
+        sourceLabel: "",
+      },
+      projects: {
+        src: "",
+        alt: "",
+        sourceUrl: "",
+        sourceLabel: "",
+      },
+    },
     heroPanel: {
       title: "",
       summary: "",

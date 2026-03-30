@@ -1,12 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Instrument_Sans } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 const instrumentSans = Instrument_Sans({
   variable: "--font-sans-ui",
@@ -47,7 +41,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f6f4ee",
+  themeColor: "#f6f5ef",
 };
 
 export default function RootLayout({
@@ -56,10 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="fr"
-      className={`${fraunces.variable} ${instrumentSans.variable} h-full antialiased`}
-    >
+    <html lang="fr" className={`${instrumentSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
