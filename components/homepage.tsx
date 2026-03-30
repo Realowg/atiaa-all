@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type {
   FoundingProject,
   GovernanceNode,
@@ -441,12 +441,12 @@ function RoadmapColumn({ step, index }: { step: RoadmapPhase; index: number }) {
 }
 
 function ContactForm() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<ContactState>("idle");
   const [message, setMessage] = useState("");
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+  function submitForm(form: HTMLFormElement) {
+    const formData = new FormData(form);
     const name = String(formData.get("name") || "").trim();
     const organization = String(formData.get("organization") || "").trim();
     const email = String(formData.get("email") || "").trim();
@@ -465,11 +465,17 @@ function ContactForm() {
     setMessage(
       "Le canal d’adhésion sera finalisé prochainement. En attendant, écrivez à contact@atiaa.org en rappelant votre organisation et votre profil."
     );
-    event.currentTarget.reset();
+    form.reset();
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    submitForm(event.currentTarget);
   }
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
       className="rounded-[2rem] border border-black/8 bg-white p-7 shadow-[0_24px_72px_rgba(17,24,39,0.06)] sm:p-8"
     >
@@ -539,7 +545,12 @@ function ContactForm() {
 
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <button
-          type="submit"
+          type="button"
+          onClick={() => {
+            if (formRef.current) {
+              submitForm(formRef.current);
+            }
+          }}
           className="inline-flex items-center justify-center rounded-full bg-ink-950 px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-navy-950"
         >
           Envoyer le message
