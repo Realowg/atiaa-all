@@ -27,7 +27,7 @@ interface RevealProps {
 interface ActionLinkProps {
   href: string;
   label: string;
-  tone?: "primary" | "secondary" | "text";
+  tone?: "primary" | "secondary" | "text" | "heroPrimary" | "heroSecondary";
   onClick?: () => void;
 }
 
@@ -49,20 +49,31 @@ function Reveal({ children, className, delay = 0 }: RevealProps) {
 
 function BrandMark() {
   return (
-    <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-black/8 bg-white shadow-[0_8px_24px_rgba(17,24,39,0.06)]">
-      <div className="absolute inset-[7px] rounded-xl border border-navy-950/10" />
-      <div className="absolute h-5 w-5 rounded-full border border-navy-950/15" />
+    <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-[1.15rem] border border-black/7 bg-white shadow-[0_10px_26px_rgba(17,24,39,0.08)]">
+      <div className="absolute inset-[7px] rounded-[0.95rem] border border-navy-950/12" />
+      <div className="absolute h-5.5 w-5.5 rounded-full border border-navy-950/15" />
       <div className="absolute h-2.5 w-2.5 rounded-full bg-navy-950" />
-      <div className="absolute h-px w-6 rotate-45 bg-saffron-500/65" />
-      <div className="absolute h-px w-6 -rotate-45 bg-saffron-500/30" />
+      <div className="absolute h-px w-7 rotate-45 bg-saffron-500/75" />
+      <div className="absolute h-px w-7 -rotate-45 bg-saffron-500/36" />
     </div>
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function SectionLabel({
+  children,
+  inverse = false,
+}: {
+  children: React.ReactNode;
+  inverse?: boolean;
+}) {
   return (
-    <span className="inline-flex items-center gap-3 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-ink-700">
-      <span className="h-px w-8 bg-navy-950/20" />
+    <span
+      className={cn(
+        "inline-flex items-center gap-3 text-[0.72rem] font-medium uppercase tracking-[0.28em]",
+        inverse ? "text-white/64" : "text-ink-700"
+      )}
+    >
+      <span className={cn("h-px w-8", inverse ? "bg-saffron-400/90" : "bg-saffron-500/60")} />
       {children}
     </span>
   );
@@ -79,7 +90,11 @@ function ActionLink({ href, label, tone = "primary", onClick }: ActionLinkProps)
           "bg-ink-950 text-white shadow-[0_14px_32px_rgba(17,24,39,0.12)] hover:-translate-y-0.5 hover:bg-navy-950",
         tone === "secondary" &&
           "border border-black/10 bg-white text-ink-950 hover:-translate-y-0.5 hover:border-black/16 hover:bg-ivory-50",
-        tone === "text" && "px-0 py-0 text-navy-950 hover:text-ink-950"
+        tone === "text" && "px-0 py-0 text-navy-950 hover:text-ink-950",
+        tone === "heroPrimary" &&
+          "bg-saffron-500 text-navy-950 shadow-[0_18px_42px_rgba(186,142,73,0.26)] hover:-translate-y-0.5 hover:bg-saffron-400",
+        tone === "heroSecondary" &&
+          "border border-white/18 bg-white/8 text-white backdrop-blur hover:-translate-y-0.5 hover:border-white/26 hover:bg-white/12"
       )}
     >
       {label}
@@ -97,7 +112,7 @@ function PlatformPanel({
 
   return (
     <motion.div
-      className="relative w-full overflow-hidden rounded-[2rem] border border-black/8 bg-white shadow-[0_28px_80px_rgba(17,24,39,0.08)]"
+      className="relative w-full overflow-hidden rounded-[2.2rem] border border-white/10 bg-[linear-gradient(160deg,rgba(24,41,62,0.96),rgba(10,18,30,0.96))] text-white shadow-[0_32px_90px_rgba(4,10,20,0.36)]"
       animate={
         reduceMotion
           ? undefined
@@ -107,90 +122,79 @@ function PlatformPanel({
       }
       transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(22,40,60,0.06),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.24),rgba(255,255,255,0))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(213,167,90,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.08),transparent_24%),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:auto,auto,96px_96px,96px_96px]" />
 
-      <div className="relative border-b border-black/8 px-5 py-5 sm:px-6">
+      <div className="relative px-5 py-5 sm:px-6">
         <div className="flex items-start justify-between gap-5">
           <div>
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.26em] text-navy-700">
-              Plateforme
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-saffron-400">
+              Coalition stratégique
             </p>
-            <h2 className="mt-3 text-[1.35rem] font-medium tracking-[-0.02em] text-ink-950 sm:text-[1.55rem]">
+            <h2 className="mt-3 text-[1.35rem] font-medium tracking-[-0.02em] text-white sm:text-[1.55rem]">
               {title}
             </h2>
           </div>
-          <div className="hidden rounded-full border border-black/8 bg-ivory-50 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-ink-700 sm:block">
+          <div className="hidden rounded-full border border-white/12 bg-white/8 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-white/76 sm:block">
             Structuration active
           </div>
         </div>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-ink-700">{summary}</p>
-      </div>
+        <p className="mt-3 hidden max-w-2xl text-sm leading-6 text-white/72 sm:block">{summary}</p>
 
-      <div className="relative grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[0.88fr_1.12fr]">
-        <div className="rounded-[1.6rem] border border-black/8 bg-ivory-50 p-4 sm:p-5">
-          <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
-            Périmètre
-          </p>
-          <div className="mt-4 space-y-3">
-            <div className="rounded-[1.2rem] border border-black/7 bg-white px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-700">Programmes</p>
-              <p className="mt-1 text-sm leading-6 text-ink-950">
-                Démonstrations publiques, workshops, bootcamps et AI Clinics.
+        <div className="mt-5 grid gap-5 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="rounded-[1.8rem] border border-white/12 bg-white/6 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.26em] text-saffron-400">
+              Noyau d’alliance
+            </p>
+            <div className="mt-4 rounded-[1.5rem] border border-saffron-500/30 bg-[linear-gradient(180deg,rgba(213,167,90,0.14),rgba(255,255,255,0.02))] px-5 py-5">
+              <p className="text-[0.68rem] uppercase tracking-[0.28em] text-white/58">ATIAA</p>
+              <p className="mt-3 font-display text-[2.4rem] leading-none text-white sm:text-[2.9rem]">
+                Mission collective
+              </p>
+              <p className="mt-4 max-w-[20rem] text-sm leading-7 text-white/76">
+                Démontrer, former et déployer l’IA appliquée avec une logique de coalition,
+                d’utilité publique et de preuve terrain.
               </p>
             </div>
-            <div className="rounded-[1.2rem] border border-black/7 bg-white px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-700">Projets</p>
-              <p className="mt-1 text-sm leading-6 text-ink-950">
-                Cas démonstrateurs pour le travail, le contenu et l’accès local au savoir.
-              </p>
-            </div>
-            <div className="rounded-[1.2rem] border border-black/7 bg-white px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.18em] text-ink-700">Adhésion</p>
-              <p className="mt-1 text-sm leading-6 text-ink-950">
-                Cercle fondateur, membres actifs et partenaires mobilisés autour de l’exécution.
-              </p>
+
+            <div className="mt-5 grid gap-3 border-t border-white/10 pt-4 sm:grid-cols-3">
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.22em] text-white/46">Mission</p>
+                <p className="mt-2 text-sm leading-6 text-white/82">Démontrer</p>
+              </div>
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.22em] text-white/46">Capacité</p>
+                <p className="mt-2 text-sm leading-6 text-white/82">Former</p>
+              </div>
+              <div>
+                <p className="text-[0.68rem] uppercase tracking-[0.22em] text-white/46">Impact</p>
+                <p className="mt-2 text-sm leading-6 text-white/82">Déployer</p>
+              </div>
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3 border-t border-black/8 pt-4 sm:grid-cols-3">
-            {metrics.map((metric) => (
-              <div key={metric.label}>
-                <p className="text-lg font-medium tracking-[-0.02em] text-ink-950">{metric.value}</p>
-                <p className="mt-1 text-[0.68rem] uppercase tracking-[0.18em] text-ink-700">
-                  {metric.label}
-                </p>
-              </div>
-            ))}
+          <div className="rounded-[1.8rem] border border-white/12 bg-white/6 backdrop-blur-sm">
+            <div className="grid gap-0 divide-y divide-white/10">
+              {items.map((item, index) => (
+                <PanelRow key={item.section} item={item} featured={index === 0} />
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="space-y-3">
-          {items.map((item, index) => (
-            <PanelRow key={item.section} item={item} featured={index === 0} />
+        <div className="mt-5 hidden gap-4 border-t border-white/10 pt-4 lg:grid lg:grid-cols-4">
+          {metrics.map((metric) => (
+            <div key={metric.label}>
+              <p className="font-display text-[1.7rem] leading-none text-white">{metric.value}</p>
+              <p className="mt-2 text-[0.68rem] uppercase tracking-[0.18em] text-white/54">
+                {metric.label}
+              </p>
+            </div>
           ))}
-
-          <div className="rounded-[1.45rem] border border-black/8 bg-ivory-50 px-4 py-4 sm:px-5">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/8 pb-3">
-              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
-                Trajectoire
-              </p>
-              <span className="rounded-full bg-white px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-navy-700">
-                Lomé → national
-              </span>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-              <p className="text-sm leading-6 text-ink-700">
-                Une structure pensée pour lancer vite, documenter les résultats et préparer des
-                pilotes plus larges.
-              </p>
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white sm:w-32">
-                <motion.div
-                  className="h-full rounded-full bg-navy-950"
-                  animate={reduceMotion ? undefined : { width: ["34%", "42%", "34%"] }}
-                  transition={{ duration: 7, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                />
-              </div>
-            </div>
+          <div>
+            <p className="font-display text-[1.7rem] leading-none text-saffron-400">Ouverte</p>
+            <p className="mt-2 text-[0.68rem] uppercase tracking-[0.18em] text-white/54">
+              Coalition d’acteurs
+            </p>
           </div>
         </div>
       </div>
@@ -202,53 +206,69 @@ function PanelRow({ item, featured = false }: { item: HeroPanelItem; featured?: 
   return (
     <div
       className={cn(
-        "rounded-[1.45rem] border px-4 py-4 sm:px-5",
+        "grid gap-4 px-4 py-4 sm:grid-cols-[54px_1fr_auto] sm:items-start sm:px-5 sm:py-5",
         featured
-          ? "border-navy-950 bg-navy-950 text-white shadow-[0_16px_36px_rgba(22,40,60,0.16)]"
-          : "border-black/8 bg-white"
+          ? "bg-black/10 text-white"
+          : "text-white"
       )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p
-          className={cn(
-            "text-[0.68rem] font-medium uppercase tracking-[0.24em]",
-            featured ? "text-white/58" : "text-ink-700"
-          )}
-        >
+      <div className="text-sm font-medium tracking-[0.04em] text-saffron-400">
+        {featured ? "01" : item.section.slice(0, 2).toUpperCase()}
+      </div>
+      <div>
+        <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-white/48">
           {item.section}
         </p>
-        <span
-          className={cn(
-            "rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em]",
-            featured ? "bg-white/10 text-white/76" : "bg-ivory-50 text-navy-700"
-          )}
-        >
-          {item.status}
-        </span>
+        <h3 className="mt-3 text-[1.08rem] font-medium leading-7 tracking-[-0.02em] text-white">
+          {item.title}
+        </h3>
+        <p className="mt-2 hidden max-w-[18rem] text-sm leading-6 text-white/68 lg:block">
+          {item.detail}
+        </p>
       </div>
-      <h3 className={cn("mt-3 text-lg font-medium tracking-[-0.02em]", featured ? "text-white" : "text-ink-950")}>
-        {item.title}
-      </h3>
-      <p className={cn("mt-2 text-sm leading-6", featured ? "text-white/72" : "text-ink-700")}>
-        {item.detail}
-      </p>
+      <span className="justify-self-start rounded-full border border-white/10 bg-white/8 px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-white/72 sm:justify-self-end">
+        {item.status}
+      </span>
     </div>
   );
 }
 
-function StatColumn({ item, index }: { item: StatItem; index: number }) {
+function StatColumn({
+  item,
+  index,
+  inverse = false,
+}: {
+  item: StatItem;
+  index: number;
+  inverse?: boolean;
+}) {
   return (
     <Reveal
-      className={cn("py-7 lg:px-6 lg:py-9", index < 3 && "lg:border-r lg:border-black/8")}
+      className={cn(
+        "py-7 lg:px-6 lg:py-9",
+        index < 3 && (inverse ? "lg:border-r lg:border-white/10" : "lg:border-r lg:border-black/8")
+      )}
       delay={index * 0.04}
     >
-      <p className="text-3xl font-medium tracking-[-0.03em] text-ink-950 sm:text-[2.35rem]">
+      <p
+        className={cn(
+          "font-display text-[2.2rem] leading-none tracking-[-0.03em] sm:text-[2.7rem]",
+          inverse ? "text-white" : "text-ink-950"
+        )}
+      >
         {item.value}
       </p>
-      <p className="mt-2 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-ink-700">
+      <p
+        className={cn(
+          "mt-2 text-[0.72rem] font-medium uppercase tracking-[0.22em]",
+          inverse ? "text-saffron-400" : "text-ink-700"
+        )}
+      >
         {item.label}
       </p>
-      <p className="mt-4 max-w-[18rem] text-sm leading-6 text-ink-700">{item.note}</p>
+      <p className={cn("mt-4 max-w-[18rem] text-sm leading-6", inverse ? "text-white/68" : "text-ink-700")}>
+        {item.note}
+      </p>
     </Reveal>
   );
 }
@@ -281,31 +301,49 @@ function ProjectModule({
 }) {
   return (
     <Reveal delay={index * 0.05}>
-      <article className="grid gap-6 rounded-[2rem] border border-black/8 bg-white px-6 py-7 shadow-[0_20px_56px_rgba(17,24,39,0.06)] sm:px-7 sm:py-8 lg:grid-cols-[0.72fr_1.28fr]">
-        <div className="border-b border-black/8 pb-5 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6">
-          <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-navy-700">
-            Projet démonstrateur {String(index + 1).padStart(2, "0")}
-          </p>
-          <h3 className="mt-4 text-[2rem] font-medium tracking-[-0.04em] text-ink-950 sm:text-[2.4rem]">
-            {project.name}
-          </h3>
-          <p className="mt-4 text-sm leading-7 text-ink-700">{project.description}</p>
+      <article
+        className={cn(
+          "grid overflow-hidden rounded-[2.05rem] border border-black/8 bg-white shadow-[0_24px_70px_rgba(17,24,39,0.07)]",
+          index % 2 === 1 ? "lg:grid-cols-[1.26fr_0.74fr]" : "lg:grid-cols-[0.74fr_1.26fr]"
+        )}
+      >
+        <div
+          className={cn(
+            "relative overflow-hidden bg-[linear-gradient(180deg,rgba(24,41,62,0.98),rgba(10,18,30,0.98))] px-6 py-7 text-white sm:px-7 sm:py-8",
+            index % 2 === 1 && "lg:order-2"
+          )}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(213,167,90,0.2),transparent_26%),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:auto,86px_86px,86px_86px] opacity-60" />
+          <div className="relative">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-saffron-400">
+              Projet démonstrateur {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3 className="mt-5 font-display text-[2.45rem] leading-none text-white sm:text-[3rem]">
+              {project.name}
+            </h3>
+            <p className="mt-5 text-sm leading-7 text-white/76">{project.description}</p>
+          </div>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div
+          className={cn(
+            "grid gap-6 px-6 py-7 sm:grid-cols-2 sm:px-7 sm:py-8",
+            index % 2 === 1 && "lg:order-1"
+          )}
+        >
           <div>
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-navy-700">
               Champ d’application
             </p>
             <p className="mt-3 text-sm leading-7 text-ink-950">{project.scope}</p>
           </div>
           <div>
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-navy-700">
               Impact démontré
             </p>
             <p className="mt-3 text-sm leading-7 text-ink-950">{project.outcome}</p>
           </div>
-          <div className="sm:col-span-2 rounded-[1.45rem] border border-black/8 bg-ivory-50 px-4 py-4">
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
+          <div className="sm:col-span-2 rounded-[1.55rem] border border-black/8 bg-ivory-50 px-4 py-4">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-navy-700">
               Rôle dans le lancement
             </p>
             <p className="mt-3 text-sm leading-7 text-ink-700">
@@ -323,64 +361,70 @@ function MembershipPanel({ tier, featured = false }: MembershipPanelProps) {
   return (
     <div
       className={cn(
-        "flex h-full flex-col justify-between rounded-[1.9rem] border px-6 py-7 sm:px-7",
+        "grid gap-6 px-6 py-7 sm:px-7 lg:grid-cols-[0.82fr_0.72fr_0.72fr_auto] lg:items-start",
         featured
-          ? "border-navy-950 bg-navy-950 text-white shadow-[0_20px_56px_rgba(22,40,60,0.14)]"
-          : "border-black/8 bg-white"
+          ? "bg-[linear-gradient(180deg,rgba(24,41,62,0.98),rgba(10,18,30,0.98))] text-white"
+          : "border-t border-black/8 bg-white"
       )}
     >
       <div>
         <p
           className={cn(
             "text-[0.72rem] font-medium uppercase tracking-[0.24em]",
-            featured ? "text-white/58" : "text-ink-700"
+            featured ? "text-saffron-400" : "text-navy-700"
           )}
         >
           {tier.title}
         </p>
-        <p className={cn("mt-5 text-base leading-7", featured ? "text-white/82" : "text-ink-700")}>
+        <p
+          className={cn(
+            "mt-4 max-w-[18rem] text-base leading-7",
+            featured ? "text-white/82" : "text-ink-950"
+          )}
+        >
           {tier.audience}
         </p>
-
-        <div className={cn("mt-6 space-y-5 border-t pt-5", featured ? "border-white/10" : "border-black/8")}>
-          <div>
-            <p
-              className={cn(
-                "text-[0.68rem] font-medium uppercase tracking-[0.22em]",
-                featured ? "text-white/44" : "text-ink-700"
-              )}
-            >
-              Ce qu’ils apportent
-            </p>
-            <p className={cn("mt-2 text-sm leading-6", featured ? "text-white/72" : "text-ink-950")}>
-              {tier.contribution}
-            </p>
-          </div>
-          <div>
-            <p
-              className={cn(
-                "text-[0.68rem] font-medium uppercase tracking-[0.22em]",
-                featured ? "text-white/44" : "text-ink-700"
-              )}
-            >
-              Ce qu’ils gagnent
-            </p>
-            <p className={cn("mt-2 text-sm leading-6", featured ? "text-white/72" : "text-ink-950")}>
-              {tier.benefit}
-            </p>
-          </div>
-        </div>
       </div>
 
-      <a
-        href="#contact"
-        className={cn(
-          "mt-8 inline-flex items-center text-sm font-medium transition hover:translate-x-1",
-          featured ? "text-white" : "text-navy-950"
-        )}
-      >
-        {tier.cta}
-      </a>
+      <div>
+        <p
+          className={cn(
+            "text-[0.68rem] font-medium uppercase tracking-[0.22em]",
+            featured ? "text-white/48" : "text-ink-700"
+          )}
+        >
+          Ce qu’ils apportent
+        </p>
+        <p className={cn("mt-2 text-sm leading-7", featured ? "text-white/74" : "text-ink-700")}>
+          {tier.contribution}
+        </p>
+      </div>
+
+      <div>
+        <p
+          className={cn(
+            "text-[0.68rem] font-medium uppercase tracking-[0.22em]",
+            featured ? "text-white/48" : "text-ink-700"
+          )}
+        >
+          Ce qu’ils gagnent
+        </p>
+        <p className={cn("mt-2 text-sm leading-7", featured ? "text-white/74" : "text-ink-700")}>
+          {tier.benefit}
+        </p>
+      </div>
+
+      <div className="flex items-start lg:justify-end lg:pl-4">
+        <a
+          href="#contact"
+          className={cn(
+            "inline-flex items-center text-sm font-medium transition hover:translate-x-1",
+            featured ? "text-white" : "text-navy-950"
+          )}
+        >
+          {tier.cta}
+        </a>
+      </div>
     </div>
   );
 }
@@ -588,32 +632,32 @@ export default function Homepage({ content }: HomepageProps) {
   return (
     <div className="page-shell relative isolate overflow-hidden bg-background text-ink-950">
       <header className="sticky top-0 z-50 border-b border-black/7 bg-background/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-[1.125rem] sm:px-8 lg:px-12">
           <a href="#accueil" className="flex items-center gap-4">
             <BrandMark />
             <div className="min-w-0">
-              <p className="text-xl font-medium tracking-[-0.02em] text-ink-950">
+              <p className="text-[1.28rem] font-medium tracking-[-0.03em] text-ink-950">
                 {content.brand.acronym}
               </p>
-              <p className="mt-0.5 max-w-[14rem] text-[0.64rem] uppercase tracking-[0.2em] text-ink-700">
+              <p className="mt-0.5 max-w-[14.5rem] text-[0.64rem] uppercase tracking-[0.22em] text-ink-700">
                 Alliance Togolaise pour l’IA Appliquée
               </p>
             </div>
           </a>
 
-          <nav className="hidden items-center gap-6 lg:flex">
+          <nav className="hidden items-center gap-7 lg:flex">
             {content.navItems.map((item: NavItem) => (
               <a
                 key={item.label}
                 href={item.href}
-                className="text-sm font-medium text-ink-700 transition hover:text-ink-950"
+                className="text-[0.95rem] font-medium text-ink-700 transition hover:text-ink-950"
               >
                 {item.label}
               </a>
             ))}
           </nav>
 
-          <div className="hidden items-center gap-5 lg:flex">
+          <div className="hidden items-center gap-6 lg:flex">
             <ActionLink href="#partenaires" label="Devenir partenaire" tone="text" />
             <ActionLink href="#adhesion" label="Rejoindre l’alliance" />
           </div>
@@ -687,39 +731,48 @@ export default function Homepage({ content }: HomepageProps) {
       </header>
 
       <main>
-        <section id="accueil" className="py-12 sm:py-14 lg:py-16">
-          <div className="mx-auto grid max-w-7xl gap-8 px-6 sm:gap-10 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-start lg:gap-12 lg:px-12">
+        <section
+          id="accueil"
+          className="relative overflow-hidden bg-[linear-gradient(180deg,#1a2c43_0%,#122033_58%,#0f1b2b_100%)] py-12 text-white sm:py-14 lg:py-14"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(213,167,90,0.2),transparent_24%),radial-gradient(circle_at_90%_18%,rgba(255,255,255,0.08),transparent_18%),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:auto,auto,96px_96px,96px_96px]" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,transparent,rgba(9,16,26,0.38))]" />
+          <div className="mx-auto grid max-w-7xl gap-8 px-6 sm:gap-10 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center lg:gap-14 lg:px-12">
             <Reveal className="max-w-[38rem]">
-              <SectionLabel>
+              <SectionLabel inverse>
                 {content.brand.status} — {content.brand.location}
               </SectionLabel>
-              <p className="mt-5 text-[0.72rem] font-medium uppercase tracking-[0.24em] text-navy-700">
+              <p className="mt-6 text-[0.72rem] font-medium uppercase tracking-[0.3em] text-saffron-400">
                 {content.brand.name}
               </p>
-              <h1 className="mt-4 max-w-[12ch] text-[2.95rem] font-medium leading-[0.96] tracking-[-0.06em] text-ink-950 sm:text-[3.7rem] lg:max-w-[11.5ch] lg:text-[4.15rem]">
-                L’alliance qui transforme l’IA en usages concrets au Togo
+              <h1 className="mt-5 max-w-[12.2ch] text-[3.05rem] font-medium leading-[0.96] tracking-[-0.06em] text-white sm:text-[3.9rem] lg:max-w-[13.25ch] lg:text-[4.55rem]">
+                L’alliance qui transforme{" "}
+                <span className="font-display font-normal text-saffron-400">
+                  l’IA en usages concrets
+                </span>{" "}
+                au Togo
               </h1>
-              <p className="mt-5 max-w-2xl text-[1.05rem] leading-7 text-ink-700 sm:text-lg sm:leading-8">
+              <p className="mt-6 max-w-2xl text-[1.05rem] leading-7 text-white/74 sm:text-lg sm:leading-8">
                 ATIAA fédère fondateurs, experts, organisations et partenaires pour démontrer,
                 former et déployer l’intelligence artificielle appliquée, en commençant par Lomé.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                <ActionLink href="#adhesion" label="Rejoindre l’alliance" />
+                <ActionLink href="#adhesion" label="Rejoindre l’alliance" tone="heroPrimary" />
                 <ActionLink
                   href="#partenaires"
                   label="Devenir partenaire"
-                  tone="secondary"
+                  tone="heroSecondary"
                 />
               </div>
 
-              <div className="mt-8 border-t border-black/8 pt-5">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
+              <div className="mt-9 border-t border-white/12 pt-5">
+                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/58">
                   Écosystème mobilisé
                 </p>
-                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm text-ink-700">
+                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm text-white/74">
                   {content.trustRoles.map((role) => (
                     <div key={role} className="flex items-center gap-2.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-navy-950" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-saffron-400" />
                       <span>{role}</span>
                     </div>
                   ))}
@@ -727,41 +780,51 @@ export default function Homepage({ content }: HomepageProps) {
               </div>
             </Reveal>
 
-            <Reveal delay={0.08} className="lg:pl-4">
+            <Reveal delay={0.08} className="lg:pl-2">
               <PlatformPanel {...content.heroPanel} />
             </Reveal>
           </div>
         </section>
 
-        <section className="border-y border-black/8 bg-white">
+        <section className="border-y border-white/8 bg-[linear-gradient(180deg,#0f1b2b,#132338)]">
           <div className="mx-auto grid max-w-7xl gap-6 px-6 sm:px-8 lg:grid-cols-4 lg:gap-0 lg:px-12">
             {content.stats.map((item, index) => (
-              <StatColumn key={item.label} item={item} index={index} />
+              <StatColumn key={item.label} item={item} index={index} inverse />
             ))}
           </div>
         </section>
 
-        <section className="bg-ivory-50 py-24 sm:py-28">
+        <section className="bg-background py-24 sm:py-28">
           <div className="mx-auto grid max-w-7xl gap-14 px-6 sm:px-8 lg:grid-cols-[0.94fr_1.06fr] lg:px-12">
             <Reveal className="max-w-[32rem]">
               <SectionLabel>Pourquoi ATIAA</SectionLabel>
               <h2 className="mt-6 text-[2.45rem] font-medium leading-[1.02] tracking-[-0.05em] text-ink-950 sm:text-[3.25rem]">
                 L’intérêt progresse, mais le passage à l’usage reste encore trop limité.
               </h2>
-            </Reveal>
-
-            <Reveal delay={0.06} className="grid gap-6">
-              <p className="max-w-3xl text-lg leading-8 text-ink-700">
+              <p className="mt-6 text-lg leading-8 text-ink-700">
                 Au Togo, l’IA attire de plus en plus d’attention. Le problème n’est plus seulement
                 la découverte. Le vrai frein se situe dans l’exécution, la formation pratique, les
                 outils, les cas d’usage documentés et les capacités de déploiement.
               </p>
-              <div className="rounded-[1.9rem] border border-black/8 bg-white px-6 py-6 shadow-[0_18px_44px_rgba(17,24,39,0.05)] sm:px-7">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-navy-700">
+            </Reveal>
+
+            <Reveal delay={0.06} className="grid gap-6">
+              <div className="rounded-[2rem] border border-black/8 bg-[linear-gradient(180deg,rgba(24,41,62,0.98),rgba(10,18,30,0.98))] px-6 py-7 text-white shadow-[0_22px_58px_rgba(10,18,30,0.16)] sm:px-7">
+                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-saffron-400">
                   Énoncé central
                 </p>
-                <p className="mt-4 font-display text-[2rem] leading-tight text-ink-950 sm:text-[2.3rem]">
+                <p className="mt-4 font-display text-[2rem] leading-tight text-white sm:text-[2.45rem]">
                   ATIAA est la couche d’activation manquante entre la curiosité et l’impact réel.
+                </p>
+                <p className="mt-5 max-w-2xl text-sm leading-7 text-white/72">
+                  L’alliance donne une forme commune à des démonstrateurs, des formations, des
+                  partenaires et des pilotes pour faire passer l’intérêt général à l’exécution.
+                </p>
+              </div>
+              <div className="border-t border-black/8 pt-5">
+                <p className="max-w-3xl text-base leading-7 text-ink-700">
+                  L’enjeu n’est pas de multiplier les discours sur l’IA, mais de structurer un
+                  cadre crédible où l’on teste, documente, transmet et déploie.
                 </p>
               </div>
             </Reveal>
@@ -772,7 +835,7 @@ export default function Homepage({ content }: HomepageProps) {
           <div className="mx-auto grid max-w-7xl gap-16 px-6 sm:px-8 lg:grid-cols-[0.94fr_1.06fr] lg:px-12">
             <Reveal className="space-y-8">
               <SectionLabel>Mission, vision, piliers</SectionLabel>
-              <div className="rounded-[1.9rem] border border-black/8 bg-ivory-50 px-6 py-6 sm:px-7">
+              <div className="border-t border-black/8 pt-6">
                 <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
                   Mission
                 </p>
@@ -781,7 +844,7 @@ export default function Homepage({ content }: HomepageProps) {
                   formation pratique, les partenariats et les projets pilotes.
                 </p>
               </div>
-              <div className="rounded-[1.9rem] border border-black/8 bg-ivory-50 px-6 py-6 sm:px-7">
+              <div className="border-t border-black/8 pt-6">
                 <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
                   Vision
                 </p>
@@ -830,8 +893,8 @@ export default function Homepage({ content }: HomepageProps) {
                 formats utiles pour produire de la preuve, de la capacité et des pilotes.
               </p>
 
-              <div className="mt-10 rounded-[1.85rem] border border-black/8 bg-white px-6 py-6">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
+              <div className="mt-10 border-t border-black/8 pt-5">
+                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-navy-700">
                   Secteurs ciblés
                 </p>
                 <div className="mt-4 flex flex-wrap gap-x-4 gap-y-3 text-sm text-ink-700">
@@ -883,10 +946,14 @@ export default function Homepage({ content }: HomepageProps) {
                 Une coalition conçue pour engager des acteurs différents autour d’un même niveau
                 d’exigence.
               </h2>
+              <p className="mt-6 max-w-3xl text-lg leading-8 text-ink-700">
+                L’adhésion n’est pas un statut décoratif. Elle définit le rôle que chacun joue
+                dans la structuration, l’animation et le déploiement concret de l’alliance.
+              </p>
             </Reveal>
 
-            <div className="mt-12 grid gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:grid-rows-2">
-              <Reveal className="lg:row-span-2">
+            <div className="mt-12 overflow-hidden rounded-[2.15rem] border border-black/8 bg-white shadow-[0_22px_58px_rgba(17,24,39,0.06)]">
+              <Reveal>
                 <MembershipPanel tier={content.membershipTiers[0]} featured />
               </Reveal>
               <Reveal delay={0.05}>
@@ -911,31 +978,37 @@ export default function Homepage({ content }: HomepageProps) {
                 d’adoption concrète de l’IA, avec un positionnement clair, sobre et orienté
                 terrain.
               </p>
-              <div className="mt-8 rounded-[1.85rem] border border-black/8 bg-ivory-50 px-6 py-6">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
-                  Lecture exécutive
-                </p>
-                <p className="mt-4 text-base leading-7 text-ink-950">
-                  Visibilité crédible, accès à des talents, opportunités de pilotes, cas d’usage
-                  terrain et co-construction d’initiatives utiles au lieu d’un simple sponsoring
-                  d’image.
-                </p>
-              </div>
+              <p className="mt-8 max-w-xl border-t border-black/8 pt-5 text-base leading-7 text-ink-700">
+                L’enjeu pour un partenaire n’est pas seulement la visibilité. C’est l’accès à un
+                cadre sérieux pour démontrer des usages, attirer des talents et co-construire des
+                pilotes utiles.
+              </p>
             </Reveal>
 
-            <div className="border-t border-black/8">
-              {content.supportPoints.map((point, index) => (
-                <Reveal
-                  key={point}
-                  delay={index * 0.04}
-                  className="grid gap-4 border-b border-black/8 py-5 sm:grid-cols-[56px_1fr]"
-                >
-                  <div className="text-sm font-medium tracking-[0.04em] text-navy-700">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                  <p className="max-w-2xl text-base leading-7 text-ink-950">{point}</p>
-                </Reveal>
-              ))}
+            <div className="overflow-hidden rounded-[2.05rem] border border-black/8 bg-white shadow-[0_24px_70px_rgba(17,24,39,0.06)]">
+              <div className="bg-[linear-gradient(180deg,rgba(24,41,62,0.98),rgba(10,18,30,0.98))] px-6 py-7 text-white sm:px-7">
+                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-saffron-400">
+                  Lecture exécutive
+                </p>
+                <p className="mt-4 font-display text-[2rem] leading-tight text-white sm:text-[2.35rem]">
+                  Une alliance sobre dans la forme, exigeante dans les preuves et utile aux
+                  acteurs qui veulent faire plus que sponsoriser.
+                </p>
+              </div>
+              <div className="px-6 py-2 sm:px-7">
+                {content.supportPoints.map((point, index) => (
+                  <Reveal
+                    key={point}
+                    delay={index * 0.04}
+                    className="grid gap-4 border-t border-black/8 py-5 sm:grid-cols-[56px_1fr]"
+                  >
+                    <div className="text-sm font-medium tracking-[0.04em] text-navy-700">
+                      {String(index + 1).padStart(2, "0")}
+                    </div>
+                    <p className="max-w-2xl text-base leading-7 text-ink-950">{point}</p>
+                  </Reveal>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -943,26 +1016,40 @@ export default function Homepage({ content }: HomepageProps) {
         <section id="gouvernance" className="bg-ivory-100 py-24 sm:py-28">
           <div className="mx-auto grid max-w-7xl gap-14 px-6 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:px-12">
             <Reveal className="max-w-[32rem]">
-              <SectionLabel>Gouvernance et confiance</SectionLabel>
-              <h2 className="mt-6 text-[2.45rem] font-medium leading-[1.02] tracking-[-0.05em] text-ink-950 sm:text-[3.25rem]">
-                Une gouvernance lisible, neutre et pensée pour l’intérêt collectif.
-              </h2>
-              <p className="mt-6 text-lg leading-8 text-ink-700">
-                L’ATIAA doit rester une mission commune. Sa gouvernance est conçue pour préserver
-                la neutralité, l’intégrité, l’anti-capture et une capacité d’action réellement
-                utile au terrain.
-              </p>
-              <div className="mt-8 rounded-[1.85rem] border border-black/8 bg-white px-6 py-6">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-ink-700">
-                  Principe de confiance
+              <div className="rounded-[2.05rem] bg-[linear-gradient(180deg,rgba(24,41,62,0.98),rgba(10,18,30,0.98))] px-6 py-7 text-white shadow-[0_26px_76px_rgba(10,18,30,0.18)] sm:px-7">
+                <SectionLabel inverse>Gouvernance et confiance</SectionLabel>
+                <h2 className="mt-6 text-[2.45rem] font-medium leading-[1.02] tracking-[-0.05em] text-white sm:text-[3.25rem]">
+                  Une gouvernance lisible, neutre et pensée pour l’intérêt collectif.
+                </h2>
+                <p className="mt-6 text-lg leading-8 text-white/74">
+                  L’ATIAA doit rester une mission commune. Sa gouvernance est conçue pour
+                  préserver la neutralité, l’intégrité, l’anti-capture et une capacité d’action
+                  réellement utile au terrain.
                 </p>
-                <p className="mt-4 font-display text-[2rem] leading-tight text-ink-950">
+                <div className="mt-8 border-t border-white/10 pt-5">
+                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-saffron-400">
+                    Principe de confiance
+                  </p>
+                  <p className="mt-4 font-display text-[2rem] leading-tight text-white">
                   Une alliance utile au terrain, pas un véhicule d’appropriation privée.
-                </p>
+                  </p>
+                </div>
+                <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                  {["Neutralité", "Intégrité", "Anti-capture", "Mission collective"].map(
+                    (principle) => (
+                      <div
+                        key={principle}
+                        className="rounded-[1.15rem] border border-white/10 bg-white/6 px-4 py-3 text-sm text-white/78"
+                      >
+                        {principle}
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
             </Reveal>
 
-            <div className="border-t border-black/8">
+            <div className="rounded-[2rem] border border-black/8 bg-white px-6 py-2 shadow-[0_18px_48px_rgba(17,24,39,0.05)] sm:px-7">
               {content.governance.map((node: GovernanceNode, index) => (
                 <GovernanceRow key={node.title} node={node} index={index} />
               ))}
@@ -1033,11 +1120,19 @@ export default function Homepage({ content }: HomepageProps) {
       </main>
 
       <footer className="border-t border-black/8 bg-white py-12">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[1.15fr_0.85fr_0.9fr] lg:px-12">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[1.1fr_0.8fr_0.9fr] lg:px-12">
           <div>
-            <p className="text-2xl font-medium tracking-[-0.03em] text-ink-950">
-              {content.brand.acronym}
-            </p>
+            <div className="flex items-center gap-4">
+              <BrandMark />
+              <div>
+                <p className="text-2xl font-medium tracking-[-0.03em] text-ink-950">
+                  {content.brand.acronym}
+                </p>
+                <p className="mt-1 text-[0.64rem] uppercase tracking-[0.22em] text-ink-700">
+                  Alliance Togolaise pour l’IA Appliquée
+                </p>
+              </div>
+            </div>
             <p className="mt-3 max-w-sm text-sm leading-6 text-ink-700">{content.brand.tagline}</p>
             <p className="mt-4 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-ink-700">
               {content.brand.location} · {content.brand.status}
