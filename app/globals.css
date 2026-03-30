@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3ede2;
+  --foreground: #15243f;
+  --bone-50: #f7f1e6;
+  --bone-100: #efe4cf;
+  --sand-200: #dec8a5;
+  --navy-700: #3e5272;
+  --navy-900: #13233d;
+  --navy-950: #0b1730;
+  --saffron-400: #dfb14f;
+  --saffron-500: #c69536;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-bone-50: var(--bone-50);
+  --color-bone-100: var(--bone-100);
+  --color-sand-200: var(--sand-200);
+  --color-navy-700: var(--navy-700);
+  --color-navy-900: var(--navy-900);
+  --color-navy-950: var(--navy-950);
+  --color-saffron-400: var(--saffron-400);
+  --color-saffron-500: var(--saffron-500);
+  --font-sans: var(--font-plex);
+  --font-display: var(--font-fraunces);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-plex), sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition-timing-function: ease;
+}
+
+::selection {
+  background: rgba(198, 149, 54, 0.26);
+  color: var(--navy-950);
+}
+
+.page-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 20% 12%, rgba(198, 149, 54, 0.03), transparent 22%),
+    radial-gradient(circle at 84% 22%, rgba(11, 23, 48, 0.02), transparent 18%),
+    linear-gradient(rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0));
+  mix-blend-mode: normal;
+  opacity: 0.18;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
