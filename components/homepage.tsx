@@ -6,14 +6,21 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 import type {
+  AudienceJourney,
   ContactPath,
+  ContactIntent,
+  FaqItem,
   FoundingProject,
   GovernanceNode,
   ImageAsset,
   MembershipTier,
   NavItem,
+  PartnerTrack,
   PageIntro,
+  ParticipationStep,
+  ProfileSlot,
   ProgrammeItem,
+  ProofSlot,
   RoadmapPhase,
   SiteContent,
   StatItem,
@@ -21,6 +28,10 @@ import type {
 
 interface SitePageProps {
   content: SiteContent;
+}
+
+interface ContactPageProps extends SitePageProps {
+  intent?: ContactIntent;
 }
 
 interface RevealProps {
@@ -51,6 +62,34 @@ interface PageLeadProps {
 }
 
 type ContactState = "idle" | "invalid" | "success";
+
+const contactIntentCopy: Record<
+  ContactIntent,
+  {
+    heading: string;
+    button: string;
+    placeholder: string;
+  }
+> = {
+  member: {
+    heading: "Demande d’adhésion",
+    button: "Envoyer la demande d’adhésion",
+    placeholder:
+      "Présentez votre profil, votre organisation et la manière dont vous souhaitez contribuer à l’alliance.",
+  },
+  partner: {
+    heading: "Demande partenaire",
+    button: "Envoyer la demande partenaire",
+    placeholder:
+      "Indiquez le type d’appui envisagé, le périmètre souhaité et les sujets que vous voulez soutenir.",
+  },
+  project: {
+    heading: "Proposition de projet ou de format",
+    button: "Envoyer la proposition",
+    placeholder:
+      "Décrivez le cas d’usage, le format ou le démonstrateur proposé et ce que vous souhaitez activer avec l’ATIAA.",
+  },
+};
 
 function cn(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
@@ -184,12 +223,24 @@ function ProgrammeRow({ programme, index }: { programme: ProgrammeItem; index: n
         {String(index + 1).padStart(2, "0")}
       </div>
       <div>
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full bg-black/[0.04] px-3 py-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-black/48">
+            {programme.status}
+          </span>
+          <span className="rounded-full bg-black/[0.04] px-3 py-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-black/48">
+            {programme.window}
+          </span>
+        </div>
         <h3 className="text-[1.2rem] font-medium tracking-[-0.03em] text-black transition duration-300 group-hover:translate-x-0.5 sm:text-[1.28rem]">
           {programme.title}
         </h3>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-black/62 transition-colors duration-300 group-hover:text-black/72">
           {programme.description}
         </p>
+        <p className="mt-3 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-black/40">
+          Public prioritaire
+        </p>
+        <p className="mt-1 text-sm leading-6 text-black/58">{programme.audience}</p>
       </div>
     </Reveal>
   );
@@ -204,6 +255,9 @@ function ProjectRow({ project, index }: { project: FoundingProject; index: numbe
       <div>
         <p className="text-[0.72rem] font-medium uppercase tracking-[0.24em] text-black/40 transition-colors duration-300 group-hover:text-black/52">
           Projet {String(index + 1).padStart(2, "0")}
+        </p>
+        <p className="mt-3 inline-flex rounded-full bg-black/[0.04] px-3 py-1 text-[0.62rem] font-medium uppercase tracking-[0.18em] text-black/48">
+          {project.stage}
         </p>
         <h3 className="mt-3 text-[2rem] font-medium leading-none tracking-[-0.06em] text-black transition duration-300 group-hover:translate-x-0.5 sm:text-[2.4rem]">
           {project.name}
@@ -220,6 +274,12 @@ function ProjectRow({ project, index }: { project: FoundingProject; index: numbe
           <p className="mt-2 text-sm leading-6 text-black/62 transition-colors duration-300 group-hover:text-black/72">
             {project.scope}
           </p>
+          <p className="mt-4 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38 transition-colors duration-300 group-hover:text-black/48">
+            Ce que cela démontre
+          </p>
+          <p className="mt-2 text-sm leading-6 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+            {project.demonstrates}
+          </p>
         </div>
       </div>
       <div>
@@ -231,13 +291,21 @@ function ProjectRow({ project, index }: { project: FoundingProject; index: numbe
         </p>
         <div className="mt-4 border-t border-black/10 pt-3 transition-colors duration-300 group-hover:border-black/18">
           <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38 transition-colors duration-300 group-hover:text-black/48">
-            Rôle dans le lancement
+            Soutien recherché
           </p>
           <p className="mt-2 text-sm leading-6 text-black/62 transition-colors duration-300 group-hover:text-black/72">
-            Projet porté par le cercle initial pour installer des preuves visibles, ouvrir la
-            coalition à d’autres initiatives et documenter les premiers usages.
+            {project.supportNeeded}
           </p>
         </div>
+        <Link
+          href="/contact?intent=project"
+          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-black transition duration-300 group-hover:translate-x-0.5"
+        >
+          Proposer un échange autour du projet
+          <span aria-hidden="true" className="transition duration-300 group-hover:translate-x-1">
+            -&gt;
+          </span>
+        </Link>
       </div>
     </Reveal>
   );
@@ -315,14 +383,24 @@ function MembershipRow({
       </div>
       <div className="flex items-start lg:justify-end">
         <Link
-          href="/contact"
+          href={tier.title === "Partenaires" ? "/contact?intent=partner" : "/contact?intent=member"}
           className={cn(
             "inline-flex items-center gap-3 text-sm font-medium transition duration-300 group-hover:translate-x-0.5",
             featured ? "text-white" : "text-black"
           )}
         >
-          {tier.cta}
-          <span aria-hidden="true" className="transition duration-300 group-hover:translate-x-1">
+          <span>
+            {tier.cta}
+            <span
+              className={cn(
+                "mt-1 block text-[0.72rem] font-normal leading-5",
+                featured ? "text-white/62" : "text-black/48"
+              )}
+            >
+              {tier.nextStep}
+            </span>
+          </span>
+          <span aria-hidden="true" className="pt-0.5 transition duration-300 group-hover:translate-x-1">
             -&gt;
           </span>
         </Link>
@@ -392,25 +470,54 @@ function RoadmapColumn({ step, index }: { step: RoadmapPhase; index: number }) {
   );
 }
 
-function ContactPathCard({ path }: { path: ContactPath }) {
+function ContactPathCard({
+  path,
+  active = false,
+}: {
+  path: ContactPath;
+  active?: boolean;
+}) {
   return (
     <Link
       href={path.href}
-      className="group block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-4 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:bg-[#f6f5ef] hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]"
+      data-intent={path.intent}
+      data-active={active ? "true" : "false"}
+      className={cn(
+        "group block rounded-[1.75rem] border px-6 py-4 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]",
+        active
+          ? "border-black bg-black text-white"
+          : "border-black/10 bg-[#faf9f4] hover:border-black/18 hover:bg-[#f6f5ef]"
+      )}
     >
       <div className="flex items-center justify-between gap-4">
-        <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42 transition-colors duration-300 group-hover:text-black/56">
+        <p
+          className={cn(
+            "text-[0.68rem] font-medium uppercase tracking-[0.24em] transition-colors duration-300",
+            active ? "text-white/62" : "text-black/42 group-hover:text-black/56"
+          )}
+        >
           {path.title}
         </p>
         <span
           aria-hidden="true"
-          className="text-sm text-black/34 transition duration-300 group-hover:translate-x-1 group-hover:text-black/56"
+          className={cn(
+            "text-sm transition duration-300 group-hover:translate-x-1",
+            active ? "text-white/62" : "text-black/34 group-hover:text-black/56"
+          )}
         >
           -&gt;
         </span>
       </div>
-      <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+      <p
+        className={cn(
+          "mt-3 text-sm leading-7 transition-colors duration-300",
+          active ? "text-white/78" : "text-black/62 group-hover:text-black/72"
+        )}
+      >
         {path.description}
+      </p>
+      <p className={cn("mt-3 text-[0.72rem] leading-6", active ? "text-white/58" : "text-black/44")}>
+        {path.nextStep}
       </p>
     </Link>
   );
@@ -420,7 +527,7 @@ function CompactProjectCard({ project }: { project: FoundingProject }) {
   return (
     <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_20px_40px_rgba(17,17,17,0.06)]">
       <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
-        Projet démonstrateur
+        {project.stage}
       </p>
       <h3 className="mt-3 text-[1.65rem] font-medium tracking-[-0.05em] text-black">
         {project.name}
@@ -430,6 +537,10 @@ function CompactProjectCard({ project }: { project: FoundingProject }) {
         Champ d’application
       </p>
       <p className="mt-2 text-sm leading-6 text-black/62">{project.scope}</p>
+      <p className="mt-4 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        Ce que cela démontre
+      </p>
+      <p className="mt-2 text-sm leading-6 text-black/62">{project.demonstrates}</p>
     </div>
   );
 }
@@ -441,6 +552,7 @@ function MembershipTeaser({ tier }: { tier: MembershipTier }) {
         {tier.title}
       </p>
       <p className="mt-3 text-sm leading-6 text-black/64">{tier.audience}</p>
+      <p className="mt-3 text-[0.72rem] leading-6 text-black/46">{tier.nextStep}</p>
       <Link
         href="/adhesion"
         className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-black transition duration-300 hover:translate-x-0.5"
@@ -452,10 +564,167 @@ function MembershipTeaser({ tier }: { tier: MembershipTier }) {
   );
 }
 
-function ContactForm() {
+function AudienceJourneyCard({ journey }: { journey: AudienceJourney }) {
+  return (
+    <div className="rounded-[1.85rem] border border-black/10 bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_22px_44px_rgba(17,17,17,0.06)] sm:p-6">
+      <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+        {journey.label}
+      </p>
+      <h3 className="mt-3 max-w-[14ch] text-[1.55rem] font-medium leading-[1.05] tracking-[-0.04em] text-black">
+        {journey.title}
+      </h3>
+      <p className="mt-3 text-sm leading-6 text-black/64">{journey.description}</p>
+      <div className="mt-5 rounded-[1.3rem] bg-[#f7f6f1] px-4 py-3">
+        <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+          Point d’appui
+        </p>
+        <p className="mt-2 text-sm leading-6 text-black/62">{journey.proof}</p>
+      </div>
+      <div className="mt-5 flex flex-col gap-3">
+        <ActionLink href={journey.href} label={journey.cta} tone="secondary" />
+        <ActionLink href={journey.contactHref} label={journey.contactCta} tone="text" />
+      </div>
+    </div>
+  );
+}
+
+function ParticipationStepCard({ step, index }: { step: ParticipationStep; index: number }) {
+  return (
+    <div className="rounded-[1.65rem] border border-black/10 bg-white px-5 py-5">
+      <p className="text-sm font-medium tracking-[0.04em] text-black/34">
+        {String(index + 1).padStart(2, "0")}
+      </p>
+      <h3 className="mt-3 text-[1.15rem] font-medium tracking-[-0.03em] text-black">{step.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-black/62">{step.description}</p>
+    </div>
+  );
+}
+
+function ProfileCard({ profile }: { profile: ProfileSlot }) {
+  return (
+    <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_20px_40px_rgba(17,17,17,0.05)]">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+            {profile.group}
+          </p>
+          <h3 className="mt-3 text-[1.15rem] font-medium tracking-[-0.03em] text-black">
+            {profile.placeholder}
+          </h3>
+        </div>
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/12 bg-[#f7f6f1] text-sm font-medium text-black/52">
+          AT
+        </div>
+      </div>
+      <p className="mt-4 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        Rôle prévu
+      </p>
+      <p className="mt-2 text-sm leading-6 text-black/62">{profile.role}</p>
+      <p className="mt-4 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        Champ d’action
+      </p>
+      <p className="mt-2 text-sm leading-6 text-black/62">{profile.focus}</p>
+      <p className="mt-4 text-[0.72rem] leading-6 text-black/44">{profile.note}</p>
+    </div>
+  );
+}
+
+function PartnerTrackCard({ track }: { track: PartnerTrack }) {
+  return (
+    <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_20px_40px_rgba(17,17,17,0.05)]">
+      <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+        Track partenaire
+      </p>
+      <h3 className="mt-3 text-[1.25rem] font-medium tracking-[-0.03em] text-black">{track.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-black/62">{track.description}</p>
+      <div className="mt-4 rounded-[1.25rem] bg-[#f7f6f1] px-4 py-3">
+        <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+          Valeur
+        </p>
+        <p className="mt-2 text-sm leading-6 text-black/62">{track.value}</p>
+      </div>
+    </div>
+  );
+}
+
+function ProofSlotCard({ slot }: { slot: ProofSlot }) {
+  return (
+    <div className="rounded-[1.75rem] border border-dashed border-black/16 bg-[#faf9f4] p-5">
+      <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+        {slot.stateLabel}
+      </p>
+      <h3 className="mt-3 text-[1.15rem] font-medium tracking-[-0.03em] text-black">{slot.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-black/62">{slot.description}</p>
+    </div>
+  );
+}
+
+function FaqRow({ item, index }: { item: FaqItem; index: number }) {
+  return (
+    <div className={cn("py-4", index > 0 && "border-t border-black/10")}>
+      <p className="text-[0.95rem] font-medium tracking-[-0.02em] text-black">{item.question}</p>
+      <p className="mt-2 text-sm leading-6 text-black/62">{item.answer}</p>
+    </div>
+  );
+}
+
+function ClosingPanel({
+  label,
+  title,
+  description,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+}: {
+  label: string;
+  title: string;
+  description: string;
+  primaryHref: string;
+  primaryLabel: string;
+  secondaryHref: string;
+  secondaryLabel: string;
+}) {
+  return (
+    <div className="rounded-[2rem] border border-black/10 bg-black px-6 py-6 text-white sm:px-8 sm:py-7">
+      <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
+        {label}
+      </p>
+      <h2 className="mt-3 max-w-3xl text-[1.5rem] font-medium leading-tight tracking-[-0.04em] sm:text-[1.7rem]">
+        {title}
+      </h2>
+      <p className="mt-4 max-w-3xl text-sm leading-7 text-white/72 sm:text-base">
+        {description}
+      </p>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <Link
+          href={primaryHref}
+          className="inline-flex items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-medium text-black transition duration-300 hover:-translate-y-0.5 hover:bg-white/92"
+        >
+          {primaryLabel}
+        </Link>
+        <Link
+          href={secondaryHref}
+          className="inline-flex items-center justify-center rounded-full border border-white/18 bg-white/6 px-5 py-3 text-sm font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:border-white/26 hover:bg-white/10"
+        >
+          {secondaryLabel}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function ContactForm({
+  intent,
+  selectedPath,
+}: {
+  intent: ContactIntent;
+  selectedPath: ContactPath;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<ContactState>("idle");
   const [message, setMessage] = useState("");
+  const intentCopy = contactIntentCopy[intent];
 
   function submitForm(form: HTMLFormElement) {
     const formData = new FormData(form);
@@ -468,14 +737,14 @@ function ContactForm() {
     if (!name || !organization || !email || !profile || !note || !email.includes("@")) {
       setState("invalid");
       setMessage(
-        "Complétez tous les champs avec une adresse email valide pour préparer votre prise de contact."
+        `Complétez tous les champs avec une adresse email valide pour préparer le parcours « ${selectedPath.title} ».`
       );
       return;
     }
 
     setState("success");
     setMessage(
-      "Le canal d’adhésion sera finalisé prochainement. En attendant, écrivez à contact@atiaa.org en rappelant votre organisation et votre profil."
+      `Votre demande « ${selectedPath.title} » est prête à être qualifiée. En attendant l’ouverture complète du canal, écrivez à contact@atiaa.org en rappelant votre organisation, votre profil et votre objectif.`
     );
     form.reset();
   }
@@ -489,8 +758,18 @@ function ContactForm() {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
+      data-contact-intent={intent}
       className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-[0_18px_50px_rgba(17,17,17,0.05)] transition duration-300 hover:border-black/16 hover:shadow-[0_28px_64px_rgba(17,17,17,0.08)] sm:p-7"
     >
+      <div className="mb-5 rounded-[1.6rem] border border-black/10 bg-[#faf9f4] px-4 py-4">
+        <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/42">
+          {intentCopy.heading}
+        </p>
+        <p className="mt-2 text-sm leading-6 text-black/62">{selectedPath.nextStep}</p>
+      </div>
+
+      <input type="hidden" name="intent" value={intent} />
+
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="space-y-2">
           <span className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/42">
@@ -551,7 +830,7 @@ function ContactForm() {
           name="message"
           rows={4}
           className="w-full rounded-[1.6rem] border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition duration-300 hover:border-black/16 focus:border-black"
-          placeholder="Décrivez votre intérêt pour l’ATIAA, vos besoins ou la forme de contribution envisagée."
+          placeholder={intentCopy.placeholder}
         />
       </label>
 
@@ -565,7 +844,7 @@ function ContactForm() {
           }}
           className="inline-flex items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-medium text-white shadow-[0_10px_26px_rgba(17,17,17,0.08)] transition duration-300 hover:-translate-y-0.5 hover:bg-black/90 hover:shadow-[0_18px_36px_rgba(17,17,17,0.14)]"
         >
-          Envoyer le message
+          {intentCopy.button}
         </button>
         <p className="max-w-xs text-sm leading-6 text-black/54">
           V1 sans backend: message de contact guidé vers l’adresse de coordination.
@@ -640,8 +919,8 @@ function SiteFrame({
           </nav>
 
           <div className="hidden items-center gap-6 lg:flex">
-            <ActionLink href="/partenaires" label="Devenir partenaire" tone="text" />
-            <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
+            <ActionLink href="/contact?intent=partner" label="Devenir partenaire" tone="text" />
+            <ActionLink href="/contact?intent=member" label="Rejoindre l’alliance" />
           </div>
 
           <button
@@ -699,8 +978,8 @@ function SiteFrame({
                   </Link>
                 ))}
                 <div className="flex flex-col gap-3 pt-3">
-                  <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
-                  <ActionLink href="/partenaires" label="Devenir partenaire" tone="secondary" />
+                  <ActionLink href="/contact?intent=member" label="Rejoindre l’alliance" />
+                  <ActionLink href="/contact?intent=partner" label="Devenir partenaire" tone="secondary" />
                 </div>
               </div>
             </motion.div>
@@ -777,8 +1056,8 @@ function HomepageOverview({ content }: SitePageProps) {
                 former et déployer l’IA appliquée, à partir de Lomé.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
-                <ActionLink href="/partenaires" label="Devenir partenaire" tone="secondary" />
+                <ActionLink href="/contact?intent=member" label="Rejoindre l’alliance" />
+                <ActionLink href="/contact?intent=partner" label="Devenir partenaire" tone="secondary" />
               </div>
 
               <div className="mt-8 border-t border-black/10 pt-4">
@@ -831,6 +1110,32 @@ function HomepageOverview({ content }: SitePageProps) {
         </div>
       </section>
 
+      <section id="journeys-overview" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-12">
+          <Reveal className="max-w-[34rem]">
+            <SectionLabel>Choisir votre parcours</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              Trois portes d’entrée, un même niveau d’exigence.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              Le site ne renvoie plus vers un contact générique. Chaque parcours qualifie un rôle,
+              un niveau d’engagement et une prochaine étape précise.
+            </p>
+            <div className="mt-8 grid gap-4">
+              {content.participationSteps.map((step, index) => (
+                <ParticipationStepCard key={step.title} step={step} index={index} />
+              ))}
+            </div>
+          </Reveal>
+
+          <div className="grid gap-5 lg:grid-cols-3">
+            {content.audienceJourneys.map((journey) => (
+              <AudienceJourneyCard key={journey.intent} journey={journey} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="about-overview" className="border-b border-black/10 bg-white py-20 sm:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.98fr_1.02fr] lg:items-center lg:px-12">
           <Reveal className="order-2 lg:order-1">
@@ -865,13 +1170,14 @@ function HomepageOverview({ content }: SitePageProps) {
                 </div>
                 <div className="rounded-[1.65rem] border border-black/10 bg-[#faf9f4] p-5">
                   <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
-                    Vision
+                    Confiance
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-black/62">{content.statements.vision}</p>
+                  <p className="mt-3 text-sm leading-6 text-black/62">{content.statements.trust}</p>
                 </div>
               </div>
-              <div className="mt-6">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <ActionLink href="/about" label="Découvrir l’alliance" tone="secondary" />
+                <ActionLink href="/contact?intent=member" label="Parler à la coordination" tone="text" />
               </div>
             </div>
           </Reveal>
@@ -896,8 +1202,9 @@ function HomepageOverview({ content }: SitePageProps) {
                 label="Formats prioritaires"
               />
             </div>
-            <div className="mt-8">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ActionLink href="/programmes" label="Voir tous les programmes" tone="secondary" />
+              <ActionLink href="/contact?intent=project" label="Proposer un format" tone="text" />
             </div>
           </Reveal>
 
@@ -924,14 +1231,21 @@ function HomepageOverview({ content }: SitePageProps) {
 
       <section id="projets-overview" className="border-b border-black/10 bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="grid gap-8 lg:grid-cols-[0.84fr_1.16fr] lg:items-end">
             <div className="max-w-3xl">
               <SectionLabel>{content.pageIntros.projets.label}</SectionLabel>
               <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
                 {content.pageIntros.projets.title}
               </h2>
+              <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+                Trois démonstrateurs servent déjà de base de preuve. Le prochain enjeu est
+                d’ouvrir la page à d’autres initiatives documentées et lisibles.
+              </p>
             </div>
-            <ActionLink href="/projets" label="Voir les projets" tone="secondary" />
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <ActionLink href="/projets" label="Voir les projets" tone="secondary" />
+              <ActionLink href="/contact?intent=project" label="Proposer un démonstrateur" tone="text" />
+            </div>
           </div>
 
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
@@ -942,37 +1256,26 @@ function HomepageOverview({ content }: SitePageProps) {
         </div>
       </section>
 
-      <section id="adhesion-overview" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-3xl">
-              <SectionLabel>{content.pageIntros.adhesion.label}</SectionLabel>
-              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                {content.pageIntros.adhesion.title}
-              </h2>
-            </div>
-            <ActionLink href="/adhesion" label="Voir les niveaux d’adhésion" tone="secondary" />
-          </div>
-
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {content.membershipTiers.map((tier) => (
-              <MembershipTeaser key={tier.title} tier={tier} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="partenaires-overview" className="border-b border-black/10 bg-white py-20 sm:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:px-12">
+      <section id="engagement-overview" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
           <Reveal className="max-w-[34rem]">
-            <SectionLabel>{content.pageIntros.partenaires.label}</SectionLabel>
+            <SectionLabel>S’engager avec ATIAA</SectionLabel>
             <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-              {content.pageIntros.partenaires.title}
+              Une adhésion structurée, un cadre partenaire lisible.
             </h2>
             <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-              {content.pageIntros.partenaires.description}
+              L’adhésion, le soutien partenaire et l’entrée par les démonstrateurs sont désormais
+              pensés comme des parcours distincts, avec des prochaines étapes visibles dès le site.
             </p>
-            <div className="mt-6 rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
+            <div className="mt-8 grid gap-5 lg:grid-cols-3">
+              {content.membershipTiers.map((tier) => (
+                <MembershipTeaser key={tier.title} tier={tier} />
+              ))}
+            </div>
+          </Reveal>
+
+          <div>
+            <div className="rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
               <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
                 Lecture exécutive
               </p>
@@ -980,49 +1283,45 @@ function HomepageOverview({ content }: SitePageProps) {
                 {content.statements.support}
               </p>
             </div>
-            <div className="mt-6">
-              <ActionLink href="/partenaires" label="Voir la page partenaires" tone="secondary" />
+            <div className="mt-5 overflow-hidden rounded-[2rem] border border-black/10 bg-white">
+              {content.supportPoints.slice(0, 3).map((point, index) => (
+                <Reveal
+                  key={point}
+                  delay={index * 0.04}
+                  className={cn(
+                    "group grid gap-4 px-6 py-4 transition duration-300 hover:bg-black/[0.02] sm:grid-cols-[52px_1fr] sm:px-7",
+                    index > 0 && "border-t border-black/10"
+                  )}
+                >
+                  <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/52">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <p className="max-w-2xl text-base leading-6 text-black/72 transition-colors duration-300 group-hover:text-black/84">
+                    {point}
+                  </p>
+                </Reveal>
+              ))}
             </div>
-          </Reveal>
-
-          <div className="overflow-hidden rounded-[2rem] border border-black/10 bg-[#faf9f4]">
-            {content.supportPoints.slice(0, 3).map((point, index) => (
-              <Reveal
-                key={point}
-                delay={index * 0.04}
-                className={cn(
-                  "group grid gap-4 px-6 py-4 transition duration-300 hover:bg-black/[0.02] sm:grid-cols-[52px_1fr] sm:px-7",
-                  index > 0 && "border-t border-black/10"
-                )}
-              >
-                <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/52">
-                  {String(index + 1).padStart(2, "0")}
-                </div>
-                <p className="max-w-2xl text-base leading-6 text-black/72 transition-colors duration-300 group-hover:text-black/84">
-                  {point}
-                </p>
-              </Reveal>
-            ))}
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <ActionLink href="/partenaires" label="Voir la page partenaires" tone="secondary" />
+              <ActionLink href="/contact?intent=partner" label="Ouvrir un échange partenaire" tone="text" />
+            </div>
           </div>
         </div>
       </section>
 
       <section id="contact-overview" className="bg-white py-20 sm:py-24">
-        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.84fr_1.16fr] lg:px-12">
-          <Reveal className="max-w-[34rem]">
-            <SectionLabel>{content.pageIntros.contact.label}</SectionLabel>
-            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-              {content.pageIntros.contact.title}
-            </h2>
-            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-              {content.pageIntros.contact.description}
-            </p>
-            <div className="mt-6">
-              <ActionLink href="/contact" label="Ouvrir la page contact" tone="secondary" />
-            </div>
-          </Reveal>
-
-          <div className="space-y-3">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <ClosingPanel
+            label="Passer à l’action"
+            title="Choisissez maintenant le prochain échange à ouvrir avec l’ATIAA."
+            description="Le site vous aide à comprendre l’alliance. Le contact vous permet de qualifier le bon parcours et de passer à une prochaine étape concrète."
+            primaryHref="/contact?intent=member"
+            primaryLabel="Rejoindre l’alliance"
+            secondaryHref="/contact?intent=project"
+            secondaryLabel="Proposer un démonstrateur"
+          />
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
             {content.contactPaths.map((path) => (
               <ContactPathCard key={path.title} path={path} />
             ))}
@@ -1050,8 +1349,8 @@ export function AboutPage({ content }: SitePageProps) {
             intro={content.pageIntros.about}
             actions={
               <>
-                <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
-                <ActionLink href="/contact" label="Nous contacter" tone="secondary" />
+                <ActionLink href="/contact?intent=member" label="Rejoindre l’alliance" />
+                <ActionLink href="/contact?intent=partner" label="Parler à la coordination" tone="secondary" />
               </>
             }
           />
@@ -1153,6 +1452,27 @@ export function AboutPage({ content }: SitePageProps) {
         </div>
       </section>
 
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-12">
+          <Reveal className="max-w-[34rem]">
+            <SectionLabel>Profils à documenter</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              Une architecture prête à accueillir les futurs profils fondateurs et de gouvernance.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              Cette page prévoit déjà les espaces nécessaires pour rendre visibles les personnes,
+              rôles et responsabilités qui renforceront la lisibilité de l’alliance à mesure que
+              la structuration avance.
+            </p>
+          </Reveal>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {content.leadershipProfiles.map((profile) => (
+              <ProfileCard key={`${profile.group}-${profile.role}`} profile={profile} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
           <div className="max-w-[34rem]">
@@ -1189,7 +1509,7 @@ export function AboutPage({ content }: SitePageProps) {
         </div>
       </section>
 
-      <section className="bg-white py-20 sm:py-24">
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
           <div className="max-w-4xl">
             <SectionLabel>Roadmap</SectionLabel>
@@ -1202,6 +1522,20 @@ export function AboutPage({ content }: SitePageProps) {
               <RoadmapColumn key={step.phase} step={step} index={index} />
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <ClosingPanel
+            label="Prochaine étape"
+            title="Si vous voulez rejoindre la structuration, commencez par un échange de cadrage."
+            description="L’ATIAA avance avec une logique de coalition: chaque nouveau membre, partenaire ou contributeur doit entrer avec un rôle clair et un niveau d’engagement explicite."
+            primaryHref="/contact?intent=member"
+            primaryLabel="Rejoindre l’alliance"
+            secondaryHref="/contact?intent=partner"
+            secondaryLabel="Parler partenariat"
+          />
         </div>
       </section>
     </SiteFrame>
@@ -1217,8 +1551,8 @@ export function ProgrammesPage({ content }: SitePageProps) {
             intro={content.pageIntros.programmes}
             actions={
               <>
-                <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
-                <ActionLink href="/contact" label="Parler à l’équipe" tone="secondary" />
+                <ActionLink href="/contact?intent=member" label="Participer à un programme" />
+                <ActionLink href="/contact?intent=project" label="Proposer un format" tone="secondary" />
               </>
             }
           />
@@ -1293,17 +1627,25 @@ export function ProgrammesPage({ content }: SitePageProps) {
         </div>
       </section>
 
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-3 lg:px-12">
+          {content.participationSteps.map((step, index) => (
+            <ParticipationStepCard key={step.title} step={step} index={index} />
+          ))}
+        </div>
+      </section>
+
       <section className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-          <div className="rounded-[2rem] border border-black/10 bg-black px-6 py-6 text-white sm:px-8 sm:py-7">
-            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
-              Cadre d’activation
-            </p>
-            <p className="mt-3 max-w-3xl text-[1.45rem] font-medium leading-tight tracking-[-0.04em] sm:text-[1.65rem]">
-              Des formats conçus pour produire de la preuve, faire monter les équipes en capacité
-              et ouvrir des pilotes utiles.
-            </p>
-          </div>
+          <ClosingPanel
+            label="Cadre d’activation"
+            title="Des formats conçus pour produire de la preuve, faire monter les équipes en capacité et ouvrir des pilotes utiles."
+            description="Si vous voulez participer à un programme, accueillir un format ou proposer une variante sectorielle, la prochaine étape est un échange de cadrage."
+            primaryHref="/contact?intent=member"
+            primaryLabel="Participer à un programme"
+            secondaryHref="/contact?intent=project"
+            secondaryLabel="Proposer un format"
+          />
         </div>
       </section>
     </SiteFrame>
@@ -1317,7 +1659,12 @@ export function ProjectsPage({ content }: SitePageProps) {
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
           <PageLead
             intro={content.pageIntros.projets}
-            actions={<ActionLink href="/contact" label="Proposer un projet" tone="secondary" />}
+            actions={
+              <>
+                <ActionLink href="/contact?intent=project" label="Proposer un projet" />
+                <ActionLink href="/contact?intent=partner" label="Soutenir un démonstrateur" tone="secondary" />
+              </>
+            }
           />
           <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] p-6 sm:p-7">
             <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
@@ -1328,6 +1675,9 @@ export function ProjectsPage({ content }: SitePageProps) {
                 <div key={project.name} className="border-t border-black/10 pt-4">
                   <p className="text-[1.35rem] font-medium tracking-[-0.04em] text-black">
                     {project.name}
+                  </p>
+                  <p className="mt-2 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+                    {project.stage}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-black/62">{project.outcome}</p>
                 </div>
@@ -1358,11 +1708,25 @@ export function ProjectsPage({ content }: SitePageProps) {
         </div>
       </section>
 
-      <section className="bg-white py-20 sm:py-24">
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
           {content.projects.map((project, index) => (
             <ProjectRow key={project.name} project={project} index={index} />
           ))}
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <ClosingPanel
+            label="Ouvrir un démonstrateur"
+            title="Vous avez un cas d’usage, un format ou un pilote crédible à proposer ?"
+            description="Le contact projet sert à qualifier la valeur terrain, les besoins d’accompagnement et la manière dont le démonstrateur peut rejoindre l’écosystème ATIAA."
+            primaryHref="/contact?intent=project"
+            primaryLabel="Proposer un projet"
+            secondaryHref="/contact?intent=partner"
+            secondaryLabel="Soutenir un démonstrateur"
+          />
         </div>
       </section>
     </SiteFrame>
@@ -1378,7 +1742,7 @@ export function MembershipPage({ content }: SitePageProps) {
             intro={content.pageIntros.adhesion}
             actions={
               <>
-                <ActionLink href="/contact" label="Ouvrir une prise de contact" />
+                <ActionLink href="/contact?intent=member" label="Ouvrir une prise de contact" />
                 <ActionLink href="/about" label="Comprendre l’alliance" tone="secondary" />
               </>
             }
@@ -1411,8 +1775,8 @@ export function MembershipPage({ content }: SitePageProps) {
         </div>
       </section>
 
-      <section className="bg-white py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:px-12">
           <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] px-6 py-6 sm:px-8">
             <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
               Principe d’engagement
@@ -1422,6 +1786,30 @@ export function MembershipPage({ content }: SitePageProps) {
               le niveau d’engagement de chaque acteur dans la structuration de l’alliance.
             </p>
           </div>
+          <div className="rounded-[2rem] border border-black/10 bg-white px-6 py-4 sm:px-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+              Questions fréquentes
+            </p>
+            <div className="mt-3">
+              {content.faqs.adhesion.map((item, index) => (
+                <FaqRow key={item.question} item={item} index={index} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <ClosingPanel
+            label="Entrer dans la coalition"
+            title="Choisissez le niveau d’engagement pertinent, puis ouvrez un échange de cadrage."
+            description="Le bon parcours ne se décide pas par intuition. Il se qualifie en fonction de votre rôle, de votre capacité d’apport et du cadre le plus utile pour l’alliance."
+            primaryHref="/contact?intent=member"
+            primaryLabel="Ouvrir une prise de contact"
+            secondaryHref="/about"
+            secondaryLabel="Voir la structure de l’alliance"
+          />
         </div>
       </section>
     </SiteFrame>
@@ -1437,7 +1825,7 @@ export function PartnersPage({ content }: SitePageProps) {
             intro={content.pageIntros.partenaires}
             actions={
               <>
-                <ActionLink href="/contact" label="Devenir partenaire" />
+                <ActionLink href="/contact?intent=partner" label="Devenir partenaire" />
                 <ActionLink href="/projets" label="Voir les démonstrateurs" tone="secondary" />
               </>
             }
@@ -1499,19 +1887,88 @@ export function PartnersPage({ content }: SitePageProps) {
           </div>
         </div>
       </section>
+
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:px-12">
+          <Reveal className="max-w-[34rem]">
+            <SectionLabel>Tracks partenaires</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              Trois manières de soutenir sans diluer l’utilité du partenariat.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              L’ATIAA prépare des cadres distincts pour les soutiens fondateurs, les appuis sur
+              programme et les partenariats orientés démonstrateurs ou pilotes.
+            </p>
+          </Reveal>
+          <div className="grid gap-5 lg:grid-cols-3">
+            {content.partnerTracks.map((track) => (
+              <PartnerTrackCard key={track.title} track={track} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:px-12">
+          <Reveal className="max-w-[34rem]">
+            <SectionLabel>Preuve à documenter</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              La page est prête à accueillir les premiers logos, soutiens et cas activés.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              Aucun faux logo n’est affiché. Les modules suivants sont prévus pour recevoir des
+              preuves réelles dès qu’elles seront disponibles.
+            </p>
+          </Reveal>
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {content.proofSlots.map((slot) => (
+              <ProofSlotCard key={slot.title} slot={slot} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <ClosingPanel
+            label="Cadre partenaire"
+            title="Si vous voulez soutenir ATIAA, ouvrez un échange structuré plutôt qu’un simple signal d’intérêt."
+            description="Le partenariat doit préciser le type d’appui, le périmètre utile et la manière dont la contribution renforce des programmes, des démonstrateurs ou la structuration globale."
+            primaryHref="/contact?intent=partner"
+            primaryLabel="Devenir partenaire"
+            secondaryHref="/projets"
+            secondaryLabel="Voir les démonstrateurs"
+          />
+        </div>
+      </section>
     </SiteFrame>
   );
 }
 
-export function ContactPage({ content }: SitePageProps) {
+export function ContactPage({ content, intent = "member" }: ContactPageProps) {
+  const selectedPath =
+    content.contactPaths.find((path) => path.intent === intent) ?? content.contactPaths[0];
+  const orderedPaths = [
+    selectedPath,
+    ...content.contactPaths.filter((path) => path.intent !== intent),
+  ];
+
   return (
     <SiteFrame content={content}>
       <section className="border-b border-black/10 bg-white py-20 sm:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
-          <PageLead intro={content.pageIntros.contact} />
+          <PageLead
+            intro={content.pageIntros.contact}
+            actions={
+              <>
+                <ActionLink href={selectedPath.href} label={selectedPath.title} tone="secondary" />
+                <ActionLink href="/about" label="Voir la structure de l’alliance" tone="text" />
+              </>
+            }
+          />
           <div className="space-y-3">
-            {content.contactPaths.map((path) => (
-              <ContactPathCard key={path.title} path={path} />
+            {orderedPaths.map((path) => (
+              <ContactPathCard key={path.title} path={path} active={path.intent === intent} />
             ))}
           </div>
         </div>
@@ -1519,22 +1976,54 @@ export function ContactPage({ content }: SitePageProps) {
 
       <section className="bg-[#f8f7f2] py-20 sm:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.84fr_1.16fr] lg:px-12">
-          <div className="space-y-3">
-            {content.contactPaths.map((path) => (
-              <ContactPathCard key={path.title} path={path} />
-            ))}
+          <div className="space-y-5">
+            <div className="rounded-[1.75rem] border border-black/10 bg-white px-6 py-5">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
+                Parcours sélectionné
+              </p>
+              <h2 className="mt-3 text-[1.4rem] font-medium tracking-[-0.04em] text-black">
+                {selectedPath.title}
+              </h2>
+              <p className="mt-3 text-sm leading-7 text-black/62">{selectedPath.description}</p>
+              <p className="mt-4 text-[0.72rem] leading-6 text-black/46">{selectedPath.nextStep}</p>
+            </div>
+            <div className="rounded-[1.75rem] border border-black/10 bg-white px-6 py-5">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
+                Ce qui se passe ensuite
+              </p>
+              <div className="mt-3 space-y-4">
+                {content.participationSteps.map((step, index) => (
+                  <div key={step.title} className={cn(index > 0 && "border-t border-black/10 pt-4")}>
+                    <p className="text-sm font-medium tracking-[-0.02em] text-black">
+                      {String(index + 1).padStart(2, "0")} · {step.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-black/62">{step.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-[1.75rem] border border-black/10 bg-white px-6 py-4">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
+                Questions fréquentes
+              </p>
+              <div className="mt-3">
+                {content.faqs.contact.map((item, index) => (
+                  <FaqRow key={item.question} item={item} index={index} />
+                ))}
+              </div>
+            </div>
             <div className="rounded-[1.75rem] border border-black/10 bg-white px-6 py-5">
               <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
                 Coordination
               </p>
               <p className="mt-3 text-sm leading-7 text-black/62">
-                En attendant l’ouverture complète du canal d’adhésion, vous pouvez écrire à
+                En attendant l’ouverture complète du canal, vous pouvez écrire à
                 <span className="font-medium text-black"> contact@atiaa.org</span>.
               </p>
             </div>
           </div>
 
-          <ContactForm />
+          <ContactForm intent={intent} selectedPath={selectedPath} />
         </div>
       </section>
     </SiteFrame>

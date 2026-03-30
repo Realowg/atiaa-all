@@ -77,11 +77,11 @@ await reviewPage.goto(targetUrl, { waitUntil: "domcontentloaded" });
 await reviewPage.waitForTimeout(1400);
 
 const sectionSelectors = [
+  "#journeys-overview",
   "#about-overview",
   "#programmes-overview",
   "#projets-overview",
-  "#adhesion-overview",
-  "#partenaires-overview",
+  "#engagement-overview",
   "#contact-overview",
 ];
 

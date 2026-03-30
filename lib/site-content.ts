@@ -1,4 +1,5 @@
 export type SiteLocale = "fr" | "en";
+export type ContactIntent = "member" | "partner" | "project";
 
 export interface NavItem {
   label: string;
@@ -11,9 +12,29 @@ export interface StatItem {
   note: string;
 }
 
+export interface AudienceJourney {
+  intent: ContactIntent;
+  label: string;
+  title: string;
+  description: string;
+  proof: string;
+  href: string;
+  cta: string;
+  contactHref: string;
+  contactCta: string;
+}
+
+export interface ParticipationStep {
+  title: string;
+  description: string;
+}
+
 export interface ProgrammeItem {
   title: string;
   description: string;
+  status: string;
+  audience: string;
+  window: string;
 }
 
 export interface FoundingProject {
@@ -21,6 +42,9 @@ export interface FoundingProject {
   description: string;
   scope: string;
   outcome: string;
+  stage: string;
+  demonstrates: string;
+  supportNeeded: string;
 }
 
 export interface MembershipTier {
@@ -29,11 +53,37 @@ export interface MembershipTier {
   contribution: string;
   benefit: string;
   cta: string;
+  nextStep: string;
 }
 
 export interface GovernanceNode {
   title: string;
   description: string;
+}
+
+export interface ProfileSlot {
+  group: string;
+  placeholder: string;
+  role: string;
+  focus: string;
+  note: string;
+}
+
+export interface PartnerTrack {
+  title: string;
+  description: string;
+  value: string;
+}
+
+export interface ProofSlot {
+  title: string;
+  description: string;
+  stateLabel: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
 }
 
 export interface RoadmapPhase {
@@ -56,9 +106,11 @@ export interface PageIntro {
 }
 
 export interface ContactPath {
+  intent: ContactIntent;
   title: string;
   description: string;
   href: string;
+  nextStep: string;
 }
 
 export interface SiteContent {
@@ -96,6 +148,8 @@ export interface SiteContent {
     trust: string;
     roadmap: string;
   };
+  audienceJourneys: AudienceJourney[];
+  participationSteps: ParticipationStep[];
   contactPaths: ContactPath[];
   stats: StatItem[];
   pillars: string[];
@@ -104,7 +158,14 @@ export interface SiteContent {
   projects: FoundingProject[];
   membershipTiers: MembershipTier[];
   supportPoints: string[];
+  partnerTracks: PartnerTrack[];
+  proofSlots: ProofSlot[];
+  leadershipProfiles: ProfileSlot[];
   governance: GovernanceNode[];
+  faqs: {
+    adhesion: FaqItem[];
+    contact: FaqItem[];
+  };
   roadmap: RoadmapPhase[];
 }
 
@@ -201,9 +262,9 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
       },
       contact: {
         label: "Contact",
-        title: "Deux chemins pour rejoindre la dynamique.",
+        title: "Trois chemins pour rejoindre la dynamique.",
         description:
-          "Que vous souhaitiez rejoindre l’alliance ou devenir partenaire fondateur, l’ATIAA ouvre un cadre de contact simple et crédible.",
+          "Que vous souhaitiez rejoindre l’alliance, devenir partenaire fondateur ou proposer un démonstrateur, l’ATIAA ouvre un cadre de contact simple et lisible.",
       },
     },
     statements: {
@@ -221,18 +282,85 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         "Une alliance utile au terrain, pas un véhicule d’appropriation privée.",
       roadmap: "ATIAA est actuellement en phase de structuration.",
     },
-    contactPaths: [
+    audienceJourneys: [
       {
-        title: "Je veux rejoindre ATIAA",
+        intent: "member",
+        label: "Parcours membre",
+        title: "Rejoindre l’alliance",
         description:
-          "Pour contribuer, apprendre, participer aux programmes ou intégrer les projets.",
-        href: "/contact",
+          "Pour contribuer aux programmes, apprendre sur des cas d’usage concrets et prendre part à une coalition orientée exécution.",
+        proof: "Adhésion structurée en trois niveaux, avec orientation vers le bon cadre d’engagement.",
+        href: "/adhesion",
+        cta: "Voir les niveaux d’adhésion",
+        contactHref: "/contact?intent=member",
+        contactCta: "Candidater",
       },
       {
+        intent: "partner",
+        label: "Parcours partenaire",
+        title: "Soutenir une infrastructure utile",
+        description:
+          "Pour appuyer une plateforme sobre, crédible et ancrée dans le terrain, avec des opportunités de pilotes, de co-branding et d’accès à des talents.",
+        proof: "Cadres partenaires distincts pour soutien fondateur, programme ou démonstrateur.",
+        href: "/partenaires",
+        cta: "Voir le cadre partenaire",
+        contactHref: "/contact?intent=partner",
+        contactCta: "Parler à l’équipe",
+      },
+      {
+        intent: "project",
+        label: "Parcours projet",
+        title: "Proposer un démonstrateur",
+        description:
+          "Pour porter un cas d’usage, un format ou un pilote qui peut renforcer la preuve terrain et enrichir le cercle initial d’initiatives.",
+        proof: "Les projets fondateurs servent de point d’entrée à d’autres démonstrateurs documentés.",
+        href: "/projets",
+        cta: "Voir les démonstrateurs",
+        contactHref: "/contact?intent=project",
+        contactCta: "Proposer un projet",
+      },
+    ],
+    participationSteps: [
+      {
+        title: "Cadrage initial",
+        description:
+          "Un premier échange permet de qualifier votre profil, votre objectif et le niveau d’engagement pertinent.",
+      },
+      {
+        title: "Orientation",
+        description:
+          "L’équipe vous dirige vers l’adhésion, le cadre partenaire ou le bon format de programme ou de projet.",
+      },
+      {
+        title: "Activation",
+        description:
+          "Le parcours se traduit ensuite par un atelier, un pilote, une contribution ou un soutien structuré.",
+      },
+    ],
+    contactPaths: [
+      {
+        intent: "member",
+        title: "Je veux rejoindre ATIAA",
+        description:
+          "Pour contribuer, apprendre, participer aux programmes ou intégrer les projets démonstrateurs.",
+        href: "/contact?intent=member",
+        nextStep: "Entretien de cadrage avec la coordination de lancement.",
+      },
+      {
+        intent: "partner",
         title: "Je veux devenir partenaire fondateur",
         description:
-          "Pour soutenir une plateforme d’activation concrète de l’IA appliquée au Togo.",
-        href: "/contact",
+          "Pour soutenir une plateforme d’activation concrète de l’IA appliquée au Togo avec un cadre clair.",
+        href: "/contact?intent=partner",
+        nextStep: "Qualification du type d’appui, du périmètre et du rythme de contribution.",
+      },
+      {
+        intent: "project",
+        title: "Je veux proposer un projet ou un format",
+        description:
+          "Pour présenter un démonstrateur, un atelier, un pilote ou un format qui mérite d’être activé avec l’alliance.",
+        href: "/contact?intent=project",
+        nextStep: "Revue du cas d’usage, de la valeur terrain et des besoins d’accompagnement.",
       },
     ],
     stats: [
@@ -269,41 +397,65 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         title: "Démonstrations publiques",
         description:
           "Des moments visibles pour montrer des usages concrets de l’IA dans le travail, l’éducation et les services.",
+        status: "Ouverture progressive",
+        audience: "Grand public, organisations, décideurs",
+        window: "Temps forts trimestriels",
       },
       {
         title: "Workshops pratiques",
         description:
           "Des sessions opérationnelles pour manipuler les outils, structurer les méthodes et produire des résultats.",
+        status: "Priorité lancement",
+        audience: "Équipes, praticiens, étudiants",
+        window: "Formats courts et récurrents",
       },
       {
         title: "Bootcamps IA",
         description:
           "Des parcours intensifs pour faire monter des équipes et des individus sur des cas d’usage réels.",
+        status: "Cohortes ciblées",
+        audience: "Talents, écoles, équipes projet",
+        window: "Cycles intensifs",
       },
       {
         title: "AI Clinics",
         description:
           "Des permanences d’accompagnement ciblées pour débloquer des besoins métiers et organisationnels.",
+        status: "Activation terrain",
+        audience: "PME, institutions, médias",
+        window: "Sessions sur rendez-vous",
       },
       {
         title: "Showcases partenaires",
         description:
           "Des vitrines crédibles pour des entreprises et institutions qui veulent co-construire des initiatives utiles.",
+        status: "Cadre partenaire",
+        audience: "Entreprises, bailleurs, institutions",
+        window: "Temps forts de visibilité",
       },
       {
         title: "Projets pilotes",
         description:
           "Des expérimentations encadrées avec objectifs, périmètres et apprentissages documentés.",
+        status: "Sélection continue",
+        audience: "Organisations prêtes à tester",
+        window: "Périmètres de 6 à 12 semaines",
       },
       {
         title: "Formation outils avancés",
         description:
           "Un niveau de maturité supérieur pour les équipes qui veulent passer de l’usage ponctuel à l’intégration.",
+        status: "Montée en capacité",
+        audience: "Équipes métiers et opérationnelles",
+        window: "Parcours en petits groupes",
       },
       {
         title: "Cas d’usage sectoriels",
         description:
           "Des formats adaptés aux réalités des PME, écoles, médias, services publics et structures de terrain.",
+        status: "Déclinaisons sectorielles",
+        audience: "Responsables secteur et porteurs terrain",
+        window: "Cadres thématiques documentés",
       },
     ],
     sectors: ["PME", "Éducation", "Médias", "Santé", "Commerce", "Services", "Administration"],
@@ -314,6 +466,11 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
           "Workspace d’IA appliquée pour le travail, la recherche, l’analyse et l’exécution structurée.",
         scope: "Productivité, recherche, pilotage d’actions",
         outcome: "Montrer comment l’IA peut devenir un véritable poste de travail augmenté.",
+        stage: "Démonstrateur fondateur",
+        demonstrates:
+          "Une IA organisée comme surface de travail pour produire, analyser et exécuter avec méthode.",
+        supportNeeded:
+          "Cas d’usage métiers, retours d’équipes pilotes et partenaires capables de documenter l’impact.",
       },
       {
         name: "Glyph",
@@ -322,6 +479,11 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         scope: "Publication, contrôle éditorial, gouvernance de contenu",
         outcome:
           "Illustrer une IA utile aux équipes qui doivent produire vite sans sacrifier la qualité.",
+        stage: "Pilote éditorial",
+        demonstrates:
+          "Comment l’IA peut fluidifier des circuits de validation et de publication tout en gardant des garde-fous clairs.",
+        supportNeeded:
+          "Équipes médias, institutions, workflows éditoriaux et cas réels de validation à éprouver.",
       },
       {
         name: "Orbis",
@@ -330,6 +492,11 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         scope: "Accès au savoir, contexte local, intelligence de terrain",
         outcome:
           "Faire émerger une IA plus proche des réalités, besoins et langues d’usage locales.",
+        stage: "Chantier de connaissance locale",
+        demonstrates:
+          "La valeur d’un accès au savoir plus contextualisé, plus ancré dans les usages et plus utile au terrain.",
+        supportNeeded:
+          "Contributions de terrain, partenaires de diffusion et retours d’usage pour renforcer la contextualisation.",
       },
     ],
     membershipTiers: [
@@ -342,6 +509,7 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         benefit:
           "Un rôle structurant dans la trajectoire de l’ATIAA, une visibilité forte et un accès prioritaire aux chantiers.",
         cta: "Rejoindre le cercle fondateur",
+        nextStep: "Entretien de cadrage avec le noyau de lancement.",
       },
       {
         title: "Membres actifs",
@@ -352,6 +520,7 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         benefit:
           "Accès aux ateliers, au réseau, aux projets et à une communauté orientée exécution.",
         cta: "Devenir membre actif",
+        nextStep: "Orientation vers un programme, un clinic ou un chantier.",
       },
       {
         title: "Partenaires",
@@ -362,6 +531,7 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
         benefit:
           "Positionnement crédible, opportunités de pilotes, accès à des talents et co-branding d’initiatives.",
         cta: "Devenir partenaire",
+        nextStep: "Qualification du type d’appui et du périmètre utile.",
       },
     ],
     supportPoints: [
@@ -371,6 +541,76 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
       "Positionnement clair sur l’IA appliquée plutôt que sur le simple discours",
       "Co-branding d’initiatives utiles et lisibles pour le terrain",
       "Accès à des cas d’usage sectoriels ancrés dans les réalités togolaises",
+    ],
+    partnerTracks: [
+      {
+        title: "Partenaire fondateur",
+        description:
+          "Pour soutenir l’installation du cadre, la lisibilité publique et les premiers actifs de l’alliance.",
+        value: "Visibilité institutionnelle, proximité stratégique et rôle structurant dans le lancement.",
+      },
+      {
+        title: "Partenaire programme",
+        description:
+          "Pour appuyer un cycle d’ateliers, un bootcamp, un clinic ou un format de montée en capacité.",
+        value: "Association directe à des formats utiles, visibles et documentables.",
+      },
+      {
+        title: "Partenaire démonstrateur",
+        description:
+          "Pour rendre possible un pilote, un cas d’usage sectoriel ou un chantier de preuve terrain.",
+        value: "Accès à des pilotes concrets et à des retours d’usage mobilisables rapidement.",
+      },
+    ],
+    proofSlots: [
+      {
+        title: "Entreprise partenaire à annoncer",
+        description:
+          "Emplacement prévu pour un logo, un nom d’organisation et un court descriptif de soutien.",
+        stateLabel: "Espace preuve",
+      },
+      {
+        title: "Institution contributrice à annoncer",
+        description:
+          "Emplacement prévu pour documenter un appui public, académique ou territorial.",
+        stateLabel: "Espace institution",
+      },
+      {
+        title: "Programme soutenu à documenter",
+        description:
+          "Emplacement prévu pour relier un partenaire à un format ou à un démonstrateur activé.",
+        stateLabel: "Espace cas d’usage",
+      },
+    ],
+    leadershipProfiles: [
+      {
+        group: "Noyau fondateur",
+        placeholder: "Profil fondateur à annoncer",
+        role: "Coordination et impulsion",
+        focus: "Structuration, mise en relation, lancement public",
+        note: "Espace prévu pour nom, organisation, biographie courte et photographie.",
+      },
+      {
+        group: "Noyau fondateur",
+        placeholder: "Profil fondateur à annoncer",
+        role: "Programmes et démonstrations",
+        focus: "Formats pratiques, cas d’usage, qualité d’exécution",
+        note: "Espace prévu pour documenter le rôle opérationnel dans les premiers programmes.",
+      },
+      {
+        group: "Conseil d’orientation",
+        placeholder: "Profil conseil à annoncer",
+        role: "Recul stratégique et intégrité",
+        focus: "Neutralité, alignement, intérêt collectif",
+        note: "Espace prévu pour futur profil d’orientation ou de référence sectorielle.",
+      },
+      {
+        group: "Experts et contributeurs",
+        placeholder: "Profil expert à annoncer",
+        role: "Expertise appliquée et accompagnement",
+        focus: "Soutien terrain, cas d’usage, accompagnement de pilotes",
+        note: "Espace prévu pour expert, partenaire académique ou contributeur sectoriel.",
+      },
     ],
     governance: [
       {
@@ -394,6 +634,42 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
           "Les acteurs qui enrichissent les travaux par leur expertise, leurs terrains et leurs capacités de déploiement.",
       },
     ],
+    faqs: {
+      adhesion: [
+        {
+          question: "Faut-il déjà être une structure établie pour adhérer ?",
+          answer:
+            "Non. L’adhésion vise aussi des porteurs de projet, des experts et des équipes en structuration, tant qu’ils peuvent contribuer de manière concrète.",
+        },
+        {
+          question: "L’adhésion donne-t-elle automatiquement accès à tous les programmes ?",
+          answer:
+            "Non. L’adhésion clarifie d’abord le rôle et le niveau d’engagement. L’accès aux formats dépend ensuite de la pertinence, des capacités et du calendrier.",
+        },
+        {
+          question: "Comment se passe l’entrée dans l’alliance ?",
+          answer:
+            "Un premier échange cadre votre profil, puis l’équipe vous oriente vers le bon niveau d’engagement ou le bon format d’activation.",
+        },
+      ],
+      contact: [
+        {
+          question: "Que se passe-t-il après l’envoi du message ?",
+          answer:
+            "La coordination examine le parcours sélectionné, puis revient vers vous pour un cadrage, une orientation ou une proposition d’étape suivante.",
+        },
+        {
+          question: "Puis-je proposer un format ou un projet même s’il n’est pas finalisé ?",
+          answer:
+            "Oui. L’objectif du premier contact est précisément d’évaluer la maturité, le potentiel terrain et les besoins d’accompagnement du projet.",
+        },
+        {
+          question: "Les partenaires peuvent-ils soutenir un seul programme ?",
+          answer:
+            "Oui. Le soutien peut être global ou ciblé sur un format, un pilote ou un démonstrateur précis selon le type d’appui recherché.",
+        },
+      ],
+    },
     roadmap: [
       {
         phase: "Phase 1",
@@ -456,6 +732,8 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
       trust: "",
       roadmap: "",
     },
+    audienceJourneys: [],
+    participationSteps: [],
     contactPaths: [],
     stats: [],
     pillars: [],
@@ -464,7 +742,14 @@ export const siteContent: Record<SiteLocale, SiteContent> = {
     projects: [],
     membershipTiers: [],
     supportPoints: [],
+    partnerTracks: [],
+    proofSlots: [],
+    leadershipProfiles: [],
     governance: [],
+    faqs: {
+      adhesion: [],
+      contact: [],
+    },
     roadmap: [],
   },
 };

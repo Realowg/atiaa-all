@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ContactPage } from "@/components/homepage";
-import { siteContent } from "@/lib/site-content";
+import { type ContactIntent, siteContent } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "Contact | ATIAA",
@@ -8,6 +8,14 @@ export const metadata: Metadata = {
     "Prenez contact avec l’ATIAA pour rejoindre l’alliance, proposer un projet ou devenir partenaire fondateur.",
 };
 
-export default function ContactRoute() {
-  return <ContactPage content={siteContent.fr} />;
+export default async function ContactRoute({
+  searchParams,
+}: {
+  searchParams: Promise<{ intent?: string }>;
+}) {
+  const params = await searchParams;
+  const intent: ContactIntent =
+    params.intent === "partner" || params.intent === "project" ? params.intent : "member";
+
+  return <ContactPage content={siteContent.fr} intent={intent} />;
 }
