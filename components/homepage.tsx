@@ -51,14 +51,20 @@ function Reveal({ children, className, delay = 0 }: RevealProps) {
   return <div className={className}>{children}</div>;
 }
 
-function BrandMark() {
+function BrandMark({ className }: { className?: string }) {
   return (
-    <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[1rem] border border-black/10 bg-white">
-      <div className="absolute inset-[7px] rounded-[0.82rem] border border-black/16" />
-      <div className="absolute h-5 w-5 rounded-full border border-black/16" />
-      <div className="absolute h-2 w-2 rounded-full bg-black" />
-      <div className="absolute h-px w-7 rotate-45 bg-black/35" />
-      <div className="absolute h-px w-7 -rotate-45 bg-black/14" />
+    <div
+      className={cn(
+        "relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-[1rem] border border-black/10 bg-white transition duration-300",
+        "group-hover:border-black/18 group-hover:shadow-[0_14px_28px_rgba(17,17,17,0.08)]",
+        className
+      )}
+    >
+      <div className="absolute inset-[7px] rounded-[0.82rem] border border-black/16 transition duration-300 group-hover:border-black/22" />
+      <div className="absolute h-5 w-5 rounded-full border border-black/16 transition duration-300 group-hover:border-black/22" />
+      <div className="absolute h-2 w-2 rounded-full bg-black transition duration-300 group-hover:scale-110" />
+      <div className="absolute h-px w-7 rotate-45 bg-black/35 transition duration-300 group-hover:bg-black/45" />
+      <div className="absolute h-px w-7 -rotate-45 bg-black/14 transition duration-300 group-hover:bg-black/20" />
     </div>
   );
 }
@@ -80,9 +86,9 @@ function ActionLink({ href, label, tone = "primary", onClick }: ActionLinkProps)
       className={cn(
         "inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black",
         tone === "primary" &&
-          "bg-black text-white hover:-translate-y-0.5 hover:bg-black/90",
+          "bg-black text-white shadow-[0_10px_26px_rgba(17,17,17,0.08)] hover:-translate-y-0.5 hover:bg-black/90 hover:shadow-[0_18px_36px_rgba(17,17,17,0.14)]",
         tone === "secondary" &&
-          "border border-black/12 bg-white text-black hover:-translate-y-0.5 hover:border-black/24 hover:bg-black/[0.03]",
+          "border border-black/12 bg-white text-black hover:-translate-y-0.5 hover:border-black/24 hover:bg-black/[0.03] hover:shadow-[0_14px_30px_rgba(17,17,17,0.06)]",
         tone === "text" && "px-0 py-0 text-black/62 hover:text-black"
       )}
     >
@@ -101,7 +107,7 @@ function ImagePanel({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-[2rem] border border-black/10 bg-[#ecebe5]",
+        "group relative overflow-hidden rounded-[2rem] border border-black/10 bg-[#ecebe5] transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_22px_48px_rgba(17,17,17,0.08)]",
         className
       )}
     >
@@ -112,13 +118,13 @@ function ImagePanel({
         priority={priority}
         sizes="(min-width: 1280px) 42vw, (min-width: 768px) 50vw, 100vw"
         className={cn(
-          "object-cover grayscale contrast-[1.14] brightness-[0.92]",
+          "object-cover grayscale contrast-[1.14] brightness-[0.92] transition duration-700 group-hover:scale-[1.03] group-hover:contrast-[1.18]",
           objectClassName
         )}
       />
-      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.14))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.14))] transition duration-500 group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.2))]" />
       {label ? (
-        <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-black/62 backdrop-blur">
+        <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-black/62 backdrop-blur transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-white/94 group-hover:text-black/72">
           {label}
         </div>
       ) : null}
@@ -147,16 +153,18 @@ function ProgrammeRow({ programme, index }: { programme: ProgrammeItem; index: n
   return (
     <Reveal
       delay={index * 0.04}
-      className="grid gap-4 border-t border-black/10 py-5 sm:grid-cols-[64px_1fr]"
+      className="group -mx-3 grid gap-4 rounded-[1.5rem] border-t border-black/10 px-3 py-5 transition duration-300 hover:border-black/18 hover:bg-black/[0.024] sm:grid-cols-[64px_1fr]"
     >
-      <div className="text-sm font-medium tracking-[0.04em] text-black/34">
+      <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/54">
         {String(index + 1).padStart(2, "0")}
       </div>
       <div>
-        <h3 className="text-[1.28rem] font-medium tracking-[-0.03em] text-black">
+        <h3 className="text-[1.28rem] font-medium tracking-[-0.03em] text-black transition duration-300 group-hover:translate-x-0.5">
           {programme.title}
         </h3>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-black/62">{programme.description}</p>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+          {programme.description}
+        </p>
       </div>
     </Reveal>
   );
@@ -166,35 +174,41 @@ function ProjectRow({ project, index }: { project: FoundingProject; index: numbe
   return (
     <Reveal
       delay={index * 0.05}
-      className="grid gap-6 border-t border-black/10 py-8 lg:grid-cols-[0.44fr_0.78fr_0.78fr]"
+      className="group -mx-4 grid gap-6 rounded-[1.75rem] border-t border-black/10 px-4 py-8 transition duration-300 hover:border-black/18 hover:bg-black/[0.022] sm:-mx-5 sm:px-5 lg:grid-cols-[0.44fr_0.78fr_0.78fr]"
     >
       <div>
-        <p className="text-[0.72rem] font-medium uppercase tracking-[0.24em] text-black/40">
+        <p className="text-[0.72rem] font-medium uppercase tracking-[0.24em] text-black/40 transition-colors duration-300 group-hover:text-black/52">
           Projet {String(index + 1).padStart(2, "0")}
         </p>
-        <h3 className="mt-4 text-[2.25rem] font-medium leading-none tracking-[-0.06em] text-black sm:text-[2.7rem]">
+        <h3 className="mt-4 text-[2.25rem] font-medium leading-none tracking-[-0.06em] text-black transition duration-300 group-hover:translate-x-0.5 sm:text-[2.7rem]">
           {project.name}
         </h3>
       </div>
       <div>
-        <p className="text-base leading-7 text-black/72">{project.description}</p>
-        <div className="mt-6 border-t border-black/10 pt-4">
-          <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        <p className="text-base leading-7 text-black/72 transition-colors duration-300 group-hover:text-black/82">
+          {project.description}
+        </p>
+        <div className="mt-6 border-t border-black/10 pt-4 transition-colors duration-300 group-hover:border-black/18">
+          <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38 transition-colors duration-300 group-hover:text-black/48">
             Champ d’application
           </p>
-          <p className="mt-3 text-sm leading-7 text-black/62">{project.scope}</p>
+          <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+            {project.scope}
+          </p>
         </div>
       </div>
       <div>
-        <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38 transition-colors duration-300 group-hover:text-black/48">
           Impact démontré
         </p>
-        <p className="mt-3 text-sm leading-7 text-black/62">{project.outcome}</p>
-        <div className="mt-6 border-t border-black/10 pt-4">
-          <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+          {project.outcome}
+        </p>
+        <div className="mt-6 border-t border-black/10 pt-4 transition-colors duration-300 group-hover:border-black/18">
+          <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38 transition-colors duration-300 group-hover:text-black/48">
             Rôle dans le lancement
           </p>
-          <p className="mt-3 text-sm leading-7 text-black/62">
+          <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
             Projet porté par le cercle initial pour installer des preuves visibles, ouvrir la
             coalition à d’autres initiatives et documenter les premiers usages.
           </p>
@@ -214,46 +228,63 @@ function MembershipRow({
   return (
     <div
       className={cn(
-        "grid gap-6 px-6 py-7 sm:px-7 lg:grid-cols-[0.8fr_0.7fr_0.7fr_auto] lg:items-start",
-        featured ? "bg-black text-white" : "border-t border-black/10 bg-white"
+        "group grid gap-6 px-6 py-7 transition duration-300 sm:px-7 lg:grid-cols-[0.8fr_0.7fr_0.7fr_auto] lg:items-start",
+        featured
+          ? "bg-black text-white hover:bg-black/96"
+          : "border-t border-black/10 bg-white hover:border-black/18 hover:bg-[#f7f6f1]"
       )}
     >
       <div>
         <p
           className={cn(
-            "text-[0.72rem] font-medium uppercase tracking-[0.24em]",
+            "text-[0.72rem] font-medium uppercase tracking-[0.24em] transition-colors duration-300",
             featured ? "text-white/54" : "text-black/42"
           )}
         >
           {tier.title}
         </p>
-        <p className={cn("mt-4 max-w-[18rem] text-base leading-7", featured ? "text-white/80" : "text-black/74")}>
+        <p
+          className={cn(
+            "mt-4 max-w-[18rem] text-base leading-7 transition-colors duration-300",
+            featured ? "text-white/80" : "text-black/74 group-hover:text-black/82"
+          )}
+        >
           {tier.audience}
         </p>
       </div>
       <div>
         <p
           className={cn(
-            "text-[0.68rem] font-medium uppercase tracking-[0.22em]",
+            "text-[0.68rem] font-medium uppercase tracking-[0.22em] transition-colors duration-300",
             featured ? "text-white/46" : "text-black/38"
           )}
         >
           Ce qu’ils apportent
         </p>
-        <p className={cn("mt-3 text-sm leading-7", featured ? "text-white/74" : "text-black/62")}>
+        <p
+          className={cn(
+            "mt-3 text-sm leading-7 transition-colors duration-300",
+            featured ? "text-white/74" : "text-black/62 group-hover:text-black/72"
+          )}
+        >
           {tier.contribution}
         </p>
       </div>
       <div>
         <p
           className={cn(
-            "text-[0.68rem] font-medium uppercase tracking-[0.22em]",
+            "text-[0.68rem] font-medium uppercase tracking-[0.22em] transition-colors duration-300",
             featured ? "text-white/46" : "text-black/38"
           )}
         >
           Ce qu’ils gagnent
         </p>
-        <p className={cn("mt-3 text-sm leading-7", featured ? "text-white/74" : "text-black/62")}>
+        <p
+          className={cn(
+            "mt-3 text-sm leading-7 transition-colors duration-300",
+            featured ? "text-white/74" : "text-black/62 group-hover:text-black/72"
+          )}
+        >
           {tier.benefit}
         </p>
       </div>
@@ -261,11 +292,14 @@ function MembershipRow({
         <a
           href="#contact"
           className={cn(
-            "inline-flex items-center text-sm font-medium transition hover:translate-x-1",
+            "inline-flex items-center gap-3 text-sm font-medium transition duration-300 group-hover:translate-x-0.5",
             featured ? "text-white" : "text-black"
           )}
         >
           {tier.cta}
+          <span aria-hidden="true" className="transition duration-300 group-hover:translate-x-1">
+            -&gt;
+          </span>
         </a>
       </div>
     </div>
@@ -276,14 +310,18 @@ function GovernanceRow({ node, index }: { node: GovernanceNode; index: number })
   return (
     <Reveal
       delay={index * 0.04}
-      className="grid gap-4 border-t border-black/10 py-5 sm:grid-cols-[56px_1fr]"
+      className="group -mx-3 grid gap-4 rounded-[1.5rem] border-t border-black/10 px-3 py-5 transition duration-300 hover:border-black/18 hover:bg-black/[0.02] sm:grid-cols-[56px_1fr]"
     >
-      <div className="text-sm font-medium tracking-[0.04em] text-black/34">
+      <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/54">
         {String(index + 1).padStart(2, "0")}
       </div>
       <div>
-        <h3 className="text-lg font-medium tracking-[-0.02em] text-black">{node.title}</h3>
-        <p className="mt-2 text-sm leading-7 text-black/62">{node.description}</p>
+        <h3 className="text-lg font-medium tracking-[-0.02em] text-black transition duration-300 group-hover:translate-x-0.5">
+          {node.title}
+        </h3>
+        <p className="mt-2 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+          {node.description}
+        </p>
       </div>
     </Reveal>
   );
@@ -296,8 +334,10 @@ function RoadmapColumn({ step, index }: { step: RoadmapPhase; index: number }) {
     <Reveal delay={index * 0.05} className="relative">
       <div
         className={cn(
-          "rounded-[1.75rem] border px-5 py-6 sm:px-6",
-          active ? "border-black bg-black text-white" : "border-black/10 bg-white"
+          "rounded-[1.75rem] border px-5 py-6 transition duration-300 sm:px-6",
+          active
+            ? "border-black bg-black text-white shadow-[0_18px_38px_rgba(17,17,17,0.12)]"
+            : "border-black/10 bg-white hover:-translate-y-1 hover:border-black/18 hover:bg-[#fcfbf7] hover:shadow-[0_18px_38px_rgba(17,17,17,0.06)]"
         )}
       >
         <div className="flex items-center justify-between gap-4">
@@ -364,7 +404,7 @@ function ContactForm() {
     <form
       ref={formRef}
       onSubmit={handleSubmit}
-      className="rounded-[2rem] border border-black/10 bg-white p-7 shadow-[0_18px_50px_rgba(17,17,17,0.05)] sm:p-8"
+      className="rounded-[2rem] border border-black/10 bg-white p-7 shadow-[0_18px_50px_rgba(17,17,17,0.05)] transition duration-300 hover:border-black/16 hover:shadow-[0_28px_64px_rgba(17,17,17,0.08)] sm:p-8"
     >
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="space-y-2">
@@ -374,7 +414,7 @@ function ContactForm() {
           <input
             type="text"
             name="name"
-            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition focus:border-black"
+            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition duration-300 hover:border-black/16 focus:border-black"
           />
         </label>
         <label className="space-y-2">
@@ -384,7 +424,7 @@ function ContactForm() {
           <input
             type="text"
             name="organization"
-            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition focus:border-black"
+            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition duration-300 hover:border-black/16 focus:border-black"
           />
         </label>
         <label className="space-y-2">
@@ -394,7 +434,7 @@ function ContactForm() {
           <input
             type="email"
             name="email"
-            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition focus:border-black"
+            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition duration-300 hover:border-black/16 focus:border-black"
           />
         </label>
         <label className="space-y-2">
@@ -404,7 +444,7 @@ function ContactForm() {
           <select
             name="profile"
             defaultValue=""
-            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition focus:border-black"
+            className="w-full rounded-2xl border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition duration-300 hover:border-black/16 focus:border-black"
           >
             <option value="" disabled>
               Choisir un profil
@@ -425,7 +465,7 @@ function ContactForm() {
         <textarea
           name="message"
           rows={5}
-          className="w-full rounded-[1.6rem] border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition focus:border-black"
+          className="w-full rounded-[1.6rem] border border-black/10 bg-[#f5f4ef] px-4 py-3 text-sm text-black outline-none transition duration-300 hover:border-black/16 focus:border-black"
           placeholder="Décrivez votre intérêt pour l’ATIAA, vos besoins ou la forme de contribution envisagée."
         />
       </label>
@@ -438,7 +478,7 @@ function ContactForm() {
               submitForm(formRef.current);
             }
           }}
-          className="inline-flex items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-black/90"
+          className="inline-flex items-center justify-center rounded-full bg-black px-5 py-3 text-sm font-medium text-white shadow-[0_10px_26px_rgba(17,17,17,0.08)] transition duration-300 hover:-translate-y-0.5 hover:bg-black/90 hover:shadow-[0_18px_36px_rgba(17,17,17,0.14)]"
         >
           Envoyer le message
         </button>
@@ -476,13 +516,13 @@ export default function Homepage({ content }: HomepageProps) {
     <div className="page-shell relative isolate overflow-hidden bg-background text-black">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-background/92 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-8 lg:px-12">
-          <a href="#accueil" className="flex items-center gap-4">
+          <a href="#accueil" className="group flex items-center gap-4">
             <BrandMark />
             <div className="min-w-0">
-              <p className="text-[1.28rem] font-medium tracking-[-0.04em] text-black">
+              <p className="text-[1.28rem] font-medium tracking-[-0.04em] text-black transition-colors duration-300 group-hover:text-black">
                 {content.brand.acronym}
               </p>
-              <p className="mt-0.5 max-w-[14.5rem] text-[0.64rem] uppercase tracking-[0.22em] text-black/42">
+              <p className="mt-0.5 max-w-[14.5rem] text-[0.64rem] uppercase tracking-[0.22em] text-black/42 transition-colors duration-300 group-hover:text-black/54">
                 Alliance Togolaise pour l’IA Appliquée
               </p>
             </div>
@@ -493,7 +533,7 @@ export default function Homepage({ content }: HomepageProps) {
               <a
                 key={item.label}
                 href={item.href}
-                className="text-[0.95rem] font-medium text-black/58 transition hover:text-black"
+                className="text-[0.95rem] font-medium text-black/58 transition duration-300 hover:text-black"
               >
                 {item.label}
               </a>
@@ -508,7 +548,7 @@ export default function Homepage({ content }: HomepageProps) {
           <button
             type="button"
             onClick={() => setMenuOpen((open) => !open)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-black lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-black transition duration-300 hover:border-black/18 hover:shadow-[0_14px_28px_rgba(17,17,17,0.08)] lg:hidden"
             aria-expanded={menuOpen}
             aria-label="Ouvrir le menu"
           >
@@ -616,20 +656,20 @@ export default function Homepage({ content }: HomepageProps) {
               </div>
             </Reveal>
 
-            <Reveal className="relative min-h-[28rem] overflow-hidden border-t border-black/10 sm:min-h-[36rem] lg:min-h-0 lg:border-l lg:border-t-0">
+            <Reveal className="group relative min-h-[28rem] overflow-hidden border-t border-black/10 transition duration-300 sm:min-h-[36rem] lg:min-h-0 lg:border-l lg:border-t-0">
               <Image
                 src={content.imagery.hero.src}
                 alt={content.imagery.hero.alt}
                 fill
                 priority
                 sizes="(min-width: 1024px) 55vw, 100vw"
-                className="object-cover object-[center_24%] grayscale contrast-[1.16] brightness-[0.86]"
+                className="object-cover object-[center_24%] grayscale contrast-[1.16] brightness-[0.86] transition duration-700 group-hover:scale-[1.025] group-hover:contrast-[1.2]"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.28))]" />
-              <div className="absolute left-5 top-5 rounded-full bg-white/88 px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-black/62 backdrop-blur">
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.28))] transition duration-500 group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.34))]" />
+              <div className="absolute left-5 top-5 rounded-full bg-white/88 px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-black/62 backdrop-blur transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-white/94">
                 Alliance en structuration
               </div>
-              <div className="absolute bottom-6 left-6 right-6 max-w-[24rem] rounded-[1.6rem] border border-white/18 bg-black/50 px-5 py-5 text-white backdrop-blur-sm">
+              <div className="absolute bottom-6 left-6 right-6 max-w-[24rem] rounded-[1.6rem] border border-white/18 bg-black/50 px-5 py-5 text-white backdrop-blur-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:border-white/24 group-hover:bg-black/56">
                 <p className="text-[0.68rem] font-medium uppercase tracking-[0.2em] text-white/60">
                   Vue de terrain
                 </p>
@@ -875,14 +915,16 @@ export default function Homepage({ content }: HomepageProps) {
                   key={point}
                   delay={index * 0.04}
                   className={cn(
-                    "grid gap-4 px-6 py-5 sm:grid-cols-[56px_1fr] sm:px-7",
+                    "group grid gap-4 px-6 py-5 transition duration-300 hover:bg-black/[0.02] sm:grid-cols-[56px_1fr] sm:px-7",
                     index > 0 && "border-t border-black/10"
                   )}
                 >
-                  <div className="text-sm font-medium tracking-[0.04em] text-black/34">
+                  <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/52">
                     {String(index + 1).padStart(2, "0")}
                   </div>
-                  <p className="max-w-2xl text-base leading-7 text-black/72">{point}</p>
+                  <p className="max-w-2xl text-base leading-7 text-black/72 transition-colors duration-300 group-hover:text-black/84">
+                    {point}
+                  </p>
                 </Reveal>
               ))}
             </div>
@@ -959,23 +1001,33 @@ export default function Homepage({ content }: HomepageProps) {
               <div className="mt-8 space-y-4">
                 <a
                   href="#contact"
-                  className="block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-5 transition hover:border-black/18"
+                  className="group block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:bg-[#f6f5ef] hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]"
                 >
-                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
-                    Je veux rejoindre ATIAA
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-black/62">
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42 transition-colors duration-300 group-hover:text-black/56">
+                      Je veux rejoindre ATIAA
+                    </p>
+                    <span aria-hidden="true" className="text-sm text-black/34 transition duration-300 group-hover:translate-x-1 group-hover:text-black/56">
+                      -&gt;
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
                     Pour contribuer, apprendre, participer aux programmes ou intégrer les projets.
                   </p>
                 </a>
                 <a
                   href="#partenaires"
-                  className="block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-5 transition hover:border-black/18"
+                  className="group block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:bg-[#f6f5ef] hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]"
                 >
-                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
-                    Je veux devenir partenaire fondateur
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-black/62">
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42 transition-colors duration-300 group-hover:text-black/56">
+                      Je veux devenir partenaire fondateur
+                    </p>
+                    <span aria-hidden="true" className="text-sm text-black/34 transition duration-300 group-hover:translate-x-1 group-hover:text-black/56">
+                      -&gt;
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
                     Pour soutenir une plateforme d’activation concrète de l’IA appliquée au Togo.
                   </p>
                 </a>
@@ -992,13 +1044,13 @@ export default function Homepage({ content }: HomepageProps) {
       <footer className="border-t border-black/10 bg-[#faf9f5] py-12">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[1.1fr_0.8fr_0.9fr] lg:px-12">
           <div>
-            <div className="flex items-center gap-4">
+            <div className="group flex items-center gap-4">
               <BrandMark />
               <div>
-                <p className="text-2xl font-medium tracking-[-0.04em] text-black">
+                <p className="text-2xl font-medium tracking-[-0.04em] text-black transition-colors duration-300 group-hover:text-black">
                   {content.brand.acronym}
                 </p>
-                <p className="mt-1 text-[0.64rem] uppercase tracking-[0.22em] text-black/42">
+                <p className="mt-1 text-[0.64rem] uppercase tracking-[0.22em] text-black/42 transition-colors duration-300 group-hover:text-black/54">
                   Alliance Togolaise pour l’IA Appliquée
                 </p>
               </div>
@@ -1014,7 +1066,11 @@ export default function Homepage({ content }: HomepageProps) {
 
           <div className="grid gap-2 text-sm text-black/62">
             {content.footerLinks.map((link) => (
-              <a key={link.label} href={link.href} className="transition hover:text-black">
+              <a
+                key={link.label}
+                href={link.href}
+                className="inline-flex items-center gap-2 transition duration-300 hover:translate-x-0.5 hover:text-black"
+              >
                 {link.label}
               </a>
             ))}
