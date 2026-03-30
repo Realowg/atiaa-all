@@ -11,6 +11,18 @@ export interface StatItem {
   note: string;
 }
 
+export interface HeroPanelItem {
+  section: string;
+  title: string;
+  detail: string;
+  status: string;
+}
+
+export interface HeroPanelMetric {
+  label: string;
+  value: string;
+}
+
 export interface ProgrammeItem {
   title: string;
   description: string;
@@ -52,6 +64,12 @@ export interface HomeContent {
   };
   navItems: NavItem[];
   trustRoles: string[];
+  heroPanel: {
+    title: string;
+    summary: string;
+    items: HeroPanelItem[];
+    metrics: HeroPanelMetric[];
+  };
   stats: StatItem[];
   pillars: string[];
   programmes: ProgrammeItem[];
@@ -83,6 +101,39 @@ export const siteContent: Record<SiteLocale, HomeContent> = {
       { label: "Contact", href: "#contact" },
     ],
     trustRoles: ["Fondateurs", "Experts", "Entreprises", "Écoles", "Partenaires"],
+    heroPanel: {
+      title: "Vue d’ensemble ATIAA",
+      summary:
+        "Une plateforme de coordination pour programmes, projets démonstrateurs, partenaires et pilotes à partir de Lomé.",
+      items: [
+        {
+          section: "Programmes",
+          title: "Démonstrations, workshops et AI Clinics",
+          detail:
+            "Des formats activables pour équipes, écoles, institutions et structures de terrain.",
+          status: "En structuration",
+        },
+        {
+          section: "Projets",
+          title: "Askia, Glyph et Orbis",
+          detail:
+            "Trois projets fondateurs pour montrer des usages concrets de l’IA appliquée.",
+          status: "Cercle initial",
+        },
+        {
+          section: "Partenaires",
+          title: "Entreprises, écoles et institutions",
+          detail:
+            "Un cadre commun pour visibilité crédible, pilotes et montée en capacité.",
+          status: "Ouvert",
+        },
+      ],
+      metrics: [
+        { label: "Base de lancement", value: "Lomé" },
+        { label: "Projets démonstrateurs", value: "3" },
+        { label: "Piliers d’action", value: "5" },
+      ],
+    },
     stats: [
       {
         value: "3",
@@ -271,6 +322,12 @@ export const siteContent: Record<SiteLocale, HomeContent> = {
     },
     navItems: [],
     trustRoles: [],
+    heroPanel: {
+      title: "",
+      summary: "",
+      items: [],
+      metrics: [],
+    },
     stats: [],
     pillars: [],
     programmes: [],

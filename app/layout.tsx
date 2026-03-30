@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Fraunces, IBM_Plex_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Fraunces, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -8,11 +8,10 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-plex",
+const instrumentSans = Instrument_Sans({
+  variable: "--font-sans-ui",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -47,6 +46,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#f6f4ee",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -55,7 +58,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${fraunces.variable} ${ibmPlexSans.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${instrumentSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

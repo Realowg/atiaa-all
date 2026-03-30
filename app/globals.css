@@ -1,30 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3ede2;
-  --foreground: #15243f;
-  --bone-50: #f7f1e6;
-  --bone-100: #efe4cf;
-  --sand-200: #dec8a5;
-  --navy-700: #3e5272;
-  --navy-900: #13233d;
-  --navy-950: #0b1730;
-  --saffron-400: #dfb14f;
-  --saffron-500: #c69536;
+  --background: #f6f4ee;
+  --foreground: #171717;
+  --ivory-50: #fbfaf7;
+  --ivory-100: #f2efe7;
+  --ivory-200: #e8e2d6;
+  --ink-700: #4e5057;
+  --ink-900: #232529;
+  --ink-950: #171717;
+  --navy-700: #365275;
+  --navy-900: #213854;
+  --navy-950: #16283c;
+  --saffron-400: #d5a75a;
+  --saffron-500: #ba8e49;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-bone-50: var(--bone-50);
-  --color-bone-100: var(--bone-100);
-  --color-sand-200: var(--sand-200);
+  --color-ivory-50: var(--ivory-50);
+  --color-ivory-100: var(--ivory-100);
+  --color-ivory-200: var(--ivory-200);
+  --color-ink-700: var(--ink-700);
+  --color-ink-900: var(--ink-900);
+  --color-ink-950: var(--ink-950);
   --color-navy-700: var(--navy-700);
   --color-navy-900: var(--navy-900);
   --color-navy-950: var(--navy-950);
   --color-saffron-400: var(--saffron-400);
   --color-saffron-500: var(--saffron-500);
-  --font-sans: var(--font-plex);
+  --font-sans: var(--font-sans-ui);
   --font-display: var(--font-fraunces);
 }
 
@@ -40,7 +46,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-plex), sans-serif;
+  font-family: var(--font-sans-ui), sans-serif;
   text-rendering: optimizeLegibility;
 }
 
@@ -53,8 +59,8 @@ textarea {
 }
 
 ::selection {
-  background: rgba(198, 149, 54, 0.26);
-  color: var(--navy-950);
+  background: rgba(22, 40, 60, 0.14);
+  color: var(--ink-950);
 }
 
 .page-shell::before {
@@ -63,11 +69,11 @@ textarea {
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 20% 12%, rgba(198, 149, 54, 0.03), transparent 22%),
-    radial-gradient(circle at 84% 22%, rgba(11, 23, 48, 0.02), transparent 18%),
-    linear-gradient(rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0));
+    radial-gradient(circle at 18% 10%, rgba(22, 40, 60, 0.04), transparent 22%),
+    radial-gradient(circle at 88% 18%, rgba(186, 142, 73, 0.05), transparent 16%),
+    linear-gradient(rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0));
   mix-blend-mode: normal;
-  opacity: 0.18;
+  opacity: 0.6;
 }
 
 @media (prefers-reduced-motion: reduce) {
