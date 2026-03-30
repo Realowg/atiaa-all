@@ -1,22 +1,26 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useState } from "react";
 import type {
+  ContactPath,
   FoundingProject,
   GovernanceNode,
-  HomeContent,
   ImageAsset,
   MembershipTier,
   NavItem,
+  PageIntro,
   ProgrammeItem,
   RoadmapPhase,
+  SiteContent,
   StatItem,
 } from "@/lib/site-content";
 
-interface HomepageProps {
-  content: HomeContent;
+interface SitePageProps {
+  content: SiteContent;
 }
 
 interface RevealProps {
@@ -38,6 +42,12 @@ interface ImagePanelProps {
   objectClassName?: string;
   label?: string;
   priority?: boolean;
+}
+
+interface PageLeadProps {
+  intro: PageIntro;
+  actions?: React.ReactNode;
+  className?: string;
 }
 
 type ContactState = "idle" | "invalid" | "success";
@@ -80,7 +90,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function ActionLink({ href, label, tone = "primary", onClick }: ActionLinkProps) {
   return (
-    <a
+    <Link
       href={href}
       onClick={onClick}
       className={cn(
@@ -93,7 +103,22 @@ function ActionLink({ href, label, tone = "primary", onClick }: ActionLinkProps)
       )}
     >
       {label}
-    </a>
+    </Link>
+  );
+}
+
+function PageLead({ intro, actions, className }: PageLeadProps) {
+  return (
+    <div className={cn("max-w-4xl", className)}>
+      <SectionLabel>{intro.label}</SectionLabel>
+      <h1 className="mt-4 max-w-[14ch] text-[2.35rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem] lg:text-[3.4rem]">
+        {intro.title}
+      </h1>
+      <p className="mt-5 max-w-3xl text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+        {intro.description}
+      </p>
+      {actions ? <div className="mt-6 flex flex-col gap-3 sm:flex-row">{actions}</div> : null}
+    </div>
   );
 }
 
@@ -159,7 +184,7 @@ function ProgrammeRow({ programme, index }: { programme: ProgrammeItem; index: n
         {String(index + 1).padStart(2, "0")}
       </div>
       <div>
-        <h3 className="text-[1.28rem] font-medium tracking-[-0.03em] text-black transition duration-300 group-hover:translate-x-0.5">
+        <h3 className="text-[1.2rem] font-medium tracking-[-0.03em] text-black transition duration-300 group-hover:translate-x-0.5 sm:text-[1.28rem]">
           {programme.title}
         </h3>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-black/62 transition-colors duration-300 group-hover:text-black/72">
@@ -289,8 +314,8 @@ function MembershipRow({
         </p>
       </div>
       <div className="flex items-start lg:justify-end">
-        <a
-          href="#contact"
+        <Link
+          href="/contact"
           className={cn(
             "inline-flex items-center gap-3 text-sm font-medium transition duration-300 group-hover:translate-x-0.5",
             featured ? "text-white" : "text-black"
@@ -300,7 +325,7 @@ function MembershipRow({
           <span aria-hidden="true" className="transition duration-300 group-hover:translate-x-1">
             -&gt;
           </span>
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -364,6 +389,66 @@ function RoadmapColumn({ step, index }: { step: RoadmapPhase; index: number }) {
         </p>
       </div>
     </Reveal>
+  );
+}
+
+function ContactPathCard({ path }: { path: ContactPath }) {
+  return (
+    <Link
+      href={path.href}
+      className="group block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-4 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:bg-[#f6f5ef] hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]"
+    >
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42 transition-colors duration-300 group-hover:text-black/56">
+          {path.title}
+        </p>
+        <span
+          aria-hidden="true"
+          className="text-sm text-black/34 transition duration-300 group-hover:translate-x-1 group-hover:text-black/56"
+        >
+          -&gt;
+        </span>
+      </div>
+      <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
+        {path.description}
+      </p>
+    </Link>
+  );
+}
+
+function CompactProjectCard({ project }: { project: FoundingProject }) {
+  return (
+    <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_20px_40px_rgba(17,17,17,0.06)]">
+      <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+        Projet démonstrateur
+      </p>
+      <h3 className="mt-3 text-[1.65rem] font-medium tracking-[-0.05em] text-black">
+        {project.name}
+      </h3>
+      <p className="mt-3 text-sm leading-6 text-black/62">{project.description}</p>
+      <p className="mt-4 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/38">
+        Champ d’application
+      </p>
+      <p className="mt-2 text-sm leading-6 text-black/62">{project.scope}</p>
+    </div>
+  );
+}
+
+function MembershipTeaser({ tier }: { tier: MembershipTier }) {
+  return (
+    <div className="rounded-[1.75rem] border border-black/10 bg-white p-5 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:shadow-[0_20px_40px_rgba(17,17,17,0.06)]">
+      <p className="text-[0.72rem] font-medium uppercase tracking-[0.24em] text-black/42">
+        {tier.title}
+      </p>
+      <p className="mt-3 text-sm leading-6 text-black/64">{tier.audience}</p>
+      <Link
+        href="/adhesion"
+        className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-black transition duration-300 hover:translate-x-0.5"
+      >
+        Voir les détails
+        <span aria-hidden="true">-&gt;</span>
+      </Link>
+    </div>
   );
 }
 
@@ -509,14 +594,21 @@ function ContactForm() {
   );
 }
 
-export default function Homepage({ content }: HomepageProps) {
+function SiteFrame({
+  content,
+  children,
+}: {
+  content: SiteContent;
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div className="page-shell relative isolate overflow-hidden bg-background text-black">
       <header className="sticky top-0 z-50 border-b border-black/10 bg-background/92 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-8 lg:px-12">
-          <a href="#accueil" className="group flex items-center gap-4">
+          <Link href="/" className="group flex items-center gap-4">
             <BrandMark />
             <div className="min-w-0">
               <p className="text-[1.28rem] font-medium tracking-[-0.04em] text-black transition-colors duration-300 group-hover:text-black">
@@ -526,23 +618,30 @@ export default function Homepage({ content }: HomepageProps) {
                 Alliance Togolaise pour l’IA Appliquée
               </p>
             </div>
-          </a>
+          </Link>
 
           <nav className="hidden items-center gap-7 lg:flex">
-            {content.navItems.map((item: NavItem) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-[0.95rem] font-medium text-black/58 transition duration-300 hover:text-black"
-              >
-                {item.label}
-              </a>
-            ))}
+            {content.navItems.map((item: NavItem) => {
+              const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={cn(
+                    "whitespace-nowrap text-[0.95rem] font-medium transition duration-300",
+                    active ? "text-black" : "text-black/58 hover:text-black"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="hidden items-center gap-6 lg:flex">
-            <ActionLink href="#partenaires" label="Devenir partenaire" tone="text" />
-            <ActionLink href="#adhesion" label="Rejoindre l’alliance" />
+            <ActionLink href="/partenaires" label="Devenir partenaire" tone="text" />
+            <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
           </div>
 
           <button
@@ -585,27 +684,23 @@ export default function Homepage({ content }: HomepageProps) {
             >
               <div className="space-y-4 px-6 py-6 sm:px-8">
                 {content.navItems.map((item) => (
-                  <a
+                  <Link
                     key={item.label}
                     href={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className="block text-base text-black/62 transition hover:text-black"
+                    className={cn(
+                      "block text-base transition",
+                      pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+                        ? "text-black"
+                        : "text-black/62 hover:text-black"
+                    )}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 ))}
                 <div className="flex flex-col gap-3 pt-3">
-                  <ActionLink
-                    href="#adhesion"
-                    label="Rejoindre l’alliance"
-                    onClick={() => setMenuOpen(false)}
-                  />
-                  <ActionLink
-                    href="#partenaires"
-                    label="Devenir partenaire"
-                    tone="secondary"
-                    onClick={() => setMenuOpen(false)}
-                  />
+                  <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
+                  <ActionLink href="/partenaires" label="Devenir partenaire" tone="secondary" />
                 </div>
               </div>
             </motion.div>
@@ -613,430 +708,7 @@ export default function Homepage({ content }: HomepageProps) {
         </AnimatePresence>
       </header>
 
-      <main>
-        <section id="accueil" className="border-b border-black/10 bg-white">
-          <div className="mx-auto max-w-[1520px] lg:grid lg:min-h-[calc(100svh-80px)] lg:grid-cols-[0.86fr_1.14fr]">
-            <Reveal className="flex items-center px-6 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14 xl:py-16">
-              <div className="max-w-[35rem]">
-                <SectionLabel>
-                  {content.brand.status} — {content.brand.location}
-                </SectionLabel>
-                <p className="mt-4 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-black/42">
-                  {content.brand.name}
-                </p>
-                <h1 className="mt-4 max-w-[10.5ch] text-[2.85rem] font-medium leading-[0.95] tracking-[-0.07em] text-black sm:text-[4rem] lg:text-[5rem]">
-                  L’alliance qui transforme l’IA en usages concrets au Togo
-                </h1>
-                <p className="mt-5 max-w-[32rem] text-base leading-7 text-black/64 sm:text-[1.02rem] sm:leading-8">
-                  ATIAA fédère fondateurs, experts, organisations et partenaires pour démontrer,
-                  former et déployer l’IA appliquée, à partir de Lomé.
-                </p>
-                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <ActionLink href="#adhesion" label="Rejoindre l’alliance" />
-                  <ActionLink
-                    href="#partenaires"
-                    label="Devenir partenaire"
-                    tone="secondary"
-                  />
-                </div>
-
-                <div className="mt-8 border-t border-black/10 pt-4">
-                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
-                    Écosystème mobilisé
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm text-black/60">
-                    {content.trustRoles.map((role) => (
-                      <div key={role} className="flex items-center gap-2.5">
-                        <span className="h-1.5 w-1.5 rounded-full bg-black/32" />
-                        <span>{role}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal className="group relative min-h-[23rem] overflow-hidden border-t border-black/10 transition duration-300 sm:min-h-[29rem] lg:min-h-0 lg:border-l lg:border-t-0">
-              <Image
-                src={content.imagery.hero.src}
-                alt={content.imagery.hero.alt}
-                fill
-                priority
-                sizes="(min-width: 1024px) 55vw, 100vw"
-                className="object-cover object-[center_24%] grayscale contrast-[1.16] brightness-[0.86] transition duration-700 group-hover:scale-[1.025] group-hover:contrast-[1.2]"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.28))] transition duration-500 group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.34))]" />
-              <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-black/62 backdrop-blur transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-white/94 sm:left-5 sm:top-5">
-                Alliance en structuration
-              </div>
-              <div className="absolute bottom-5 left-5 right-5 max-w-[22rem] rounded-[1.5rem] border border-white/18 bg-black/50 px-4 py-4 text-white backdrop-blur-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:border-white/24 group-hover:bg-black/56 sm:bottom-6 sm:left-6 sm:right-6 sm:max-w-[24rem] sm:px-5 sm:py-5">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.2em] text-white/60">
-                  Vue de terrain
-                </p>
-                <p className="mt-2 text-sm leading-6 text-white/86 sm:mt-3 sm:text-base sm:leading-7">
-                  Une plateforme qui rapproche les acteurs, structure les démonstrations et rend
-                  l’IA appliquée visible et transmissible.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="border-b border-black/10 bg-[#f7f6f1]">
-          <div className="mx-auto grid max-w-7xl gap-6 px-6 sm:px-8 lg:grid-cols-4 lg:gap-0 lg:px-12">
-            {content.stats.map((item, index) => (
-              <StatColumn key={item.label} item={item} index={index} />
-            ))}
-          </div>
-        </section>
-
-        <section className="border-b border-black/10 bg-white py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.98fr_1.02fr] lg:items-center lg:px-12">
-            <Reveal className="order-2 lg:order-1">
-              <ImagePanel
-                image={content.imagery.why}
-                className="aspect-[11/10] sm:aspect-[16/10] lg:h-[34rem]"
-                objectClassName="object-[center_32%]"
-                label="Adoption concrète"
-              />
-            </Reveal>
-
-            <Reveal delay={0.06} className="order-1 lg:order-2">
-              <div className="max-w-[34rem]">
-                <SectionLabel>Pourquoi ATIAA</SectionLabel>
-                <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                  L’intérêt pour l’IA progresse, mais l’exécution reste encore trop limitée.
-                </h2>
-                <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                  Au Togo, l’IA suscite un intérêt croissant. Le vrai frein n’est plus la
-                  curiosité, mais la capacité à outiller, former, tester et déployer des usages
-                  réels.
-                </p>
-                <div className="mt-8 border-l-2 border-black pl-5 sm:pl-6">
-                  <p className="text-[1.55rem] font-medium leading-tight tracking-[-0.04em] text-black sm:text-[2rem]">
-                    ATIAA est la couche d’activation manquante entre la curiosité et l’impact réel.
-                  </p>
-                </div>
-                <p className="mt-6 max-w-[28rem] text-sm leading-6 text-black/62 sm:text-base sm:leading-7">
-                  L’alliance structure démonstrateurs, programmes, partenaires et pilotes pour
-                  rendre l’IA utile, visible et crédible.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <section id="mission" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-12 px-6 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:px-12">
-            <Reveal className="max-w-[34rem] space-y-8">
-              <div>
-                <SectionLabel>Mission, vision, piliers</SectionLabel>
-                <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[2.9rem]">
-                  Une plateforme d’exécution pour l’IA appliquée.
-                </h2>
-              </div>
-              <div className="border-t border-black/10 pt-5">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
-                  Mission
-                </p>
-                <p className="mt-3 text-base leading-7 text-black/72 sm:text-lg sm:leading-8">
-                  Accélérer l’adoption concrète de l’IA au Togo par la démonstration, la
-                  formation pratique, les partenariats et les projets pilotes.
-                </p>
-              </div>
-              <div className="border-t border-black/10 pt-5">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
-                  Vision
-                </p>
-                <p className="mt-3 text-base leading-7 text-black/72 sm:text-lg sm:leading-8">
-                  Faire du Togo, en commençant par Lomé, un pôle de référence de l’IA appliquée
-                  en Afrique francophone.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.08}>
-              <div className="border-t border-black/10">
-                {content.pillars.map((pillar, index) => (
-                  <div
-                    key={pillar}
-                    className={cn(
-                      "grid gap-3 border-b border-black/10 py-4 sm:grid-cols-[64px_1fr]",
-                      index === 0 && "pt-0"
-                    )}
-                  >
-                    <div className="text-sm font-medium tracking-[0.04em] text-black/34">
-                      {String(index + 1).padStart(2, "0")}
-                    </div>
-                    <div className="flex items-center justify-between gap-4">
-                      <p className="text-[1.18rem] font-medium tracking-[-0.03em] text-black sm:text-[1.24rem]">
-                        {pillar}
-                      </p>
-                      <span className="h-2.5 w-2.5 rounded-full bg-black/18" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <section id="programmes" className="border-b border-black/10 bg-white py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
-            <Reveal className="lg:sticky lg:top-28 lg:self-start">
-              <SectionLabel>Programmes</SectionLabel>
-              <h2 className="mt-4 max-w-[11ch] text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                Des formats concrets pour apprendre, tester et déployer.
-              </h2>
-              <p className="mt-5 max-w-lg text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                L’ATIAA organise des formats utiles pour produire de la preuve, de la capacité
-                et des pilotes, plutôt qu’un discours abstrait.
-              </p>
-
-              <div className="mt-8">
-                <ImagePanel
-                  image={content.imagery.programmes}
-                  className="aspect-[15/10] sm:aspect-[4/3]"
-                  objectClassName="object-center"
-                  label="Démontrer et former"
-                />
-              </div>
-
-              <div className="mt-8 border-t border-black/10 pt-4">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
-                  Secteurs ciblés
-                </p>
-                <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-sm text-black/62">
-                  {content.sectors.map((sector) => (
-                    <span key={sector} className="inline-flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-black/30" />
-                      {sector}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-
-            <div className="border-t border-black/10">
-              {content.programmes.map((programme: ProgrammeItem, index) => (
-                <ProgrammeRow key={programme.title} programme={programme} index={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="projets" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-end">
-              <Reveal className="max-w-[36rem]">
-                <SectionLabel>Projets fondateurs</SectionLabel>
-                <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                  Des démonstrateurs réels pour installer la crédibilité par la preuve.
-                </h2>
-                <p className="mt-5 max-w-3xl text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                  ATIAA s’appuie à son lancement sur un premier ensemble de projets démonstrateurs
-                  portés par le cercle initial. Ils illustrent différentes catégories d’IA
-                  appliquée et peuvent être rejoints par d’autres initiatives.
-                </p>
-              </Reveal>
-              <Reveal delay={0.06}>
-                <ImagePanel
-                  image={content.imagery.projects}
-                  className="aspect-[16/10] sm:aspect-[16/9]"
-                  objectClassName="object-center"
-                  label="Ateliers et preuves terrain"
-                />
-              </Reveal>
-            </div>
-
-            <div className="mt-10">
-              {content.projects.map((project: FoundingProject, index) => (
-                <ProjectRow key={project.name} project={project} index={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="adhesion" className="border-b border-black/10 bg-white py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <Reveal className="max-w-4xl">
-              <SectionLabel>Adhésion</SectionLabel>
-              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                Une coalition conçue pour engager des acteurs différents autour d’un même niveau
-                d’exigence.
-              </h2>
-              <p className="mt-5 max-w-3xl text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                L’adhésion n’est pas un statut décoratif. Elle définit le rôle que chacun joue
-                dans la structuration, l’animation et le déploiement concret de l’alliance.
-              </p>
-            </Reveal>
-
-            <div className="mt-10 overflow-hidden rounded-[2rem] border border-black/10">
-              <Reveal>
-                <MembershipRow tier={content.membershipTiers[0]} featured />
-              </Reveal>
-              <Reveal delay={0.05}>
-                <MembershipRow tier={content.membershipTiers[1]} />
-              </Reveal>
-              <Reveal delay={0.1}>
-                <MembershipRow tier={content.membershipTiers[2]} />
-              </Reveal>
-            </div>
-          </div>
-        </section>
-
-        <section id="partenaires" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:px-12">
-            <Reveal className="max-w-[34rem]">
-              <SectionLabel>Pourquoi soutenir ATIAA</SectionLabel>
-              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                Un point d’appui crédible pour les entreprises et institutions.
-              </h2>
-              <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                Soutenir ATIAA, c’est participer à une infrastructure de démonstration et
-                d’adoption concrète de l’IA, avec un positionnement clair et orienté terrain.
-              </p>
-              <div className="mt-6 rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
-                  Lecture exécutive
-                </p>
-                <p className="mt-3 text-[1.5rem] font-medium leading-tight tracking-[-0.04em] text-white sm:text-[1.6rem]">
-                  Une alliance utile aux acteurs qui veulent démontrer, former et lancer des
-                  pilotes, pas simplement afficher un intérêt pour l’IA.
-                </p>
-              </div>
-            </Reveal>
-
-            <div className="overflow-hidden rounded-[2rem] border border-black/10 bg-white">
-              {content.supportPoints.map((point, index) => (
-                <Reveal
-                  key={point}
-                  delay={index * 0.04}
-                  className={cn(
-                    "group grid gap-4 px-6 py-4 transition duration-300 hover:bg-black/[0.02] sm:grid-cols-[52px_1fr] sm:px-7",
-                    index > 0 && "border-t border-black/10"
-                  )}
-                >
-                  <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/52">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                  <p className="max-w-2xl text-base leading-6 text-black/72 transition-colors duration-300 group-hover:text-black/84">
-                    {point}
-                  </p>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="gouvernance" className="border-b border-black/10 bg-white py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
-            <Reveal className="max-w-[34rem]">
-              <SectionLabel>Gouvernance et confiance</SectionLabel>
-              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                Une gouvernance lisible, neutre et pensée pour l’intérêt collectif.
-              </h2>
-              <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                L’ATIAA doit rester une mission commune. Sa gouvernance est conçue pour préserver
-                neutralité, intégrité et capacité d’action utile au terrain.
-              </p>
-              <div className="mt-8">
-                <ImagePanel
-                  image={content.imagery.why}
-                  className="aspect-[15/10] sm:aspect-[16/9]"
-                  objectClassName="object-[center_42%]"
-                  label="Confiance et coordination"
-                />
-              </div>
-              <div className="mt-6 rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
-                <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
-                  Principe de confiance
-                </p>
-                <p className="mt-3 text-[1.5rem] font-medium leading-tight tracking-[-0.04em] text-white sm:text-[1.65rem]">
-                  Une alliance utile au terrain, pas un véhicule d’appropriation privée.
-                </p>
-              </div>
-            </Reveal>
-
-            <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] px-6 py-2 sm:px-7">
-              {content.governance.map((node: GovernanceNode, index) => (
-                <GovernanceRow key={node.title} node={node} index={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="roadmap" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <Reveal className="max-w-4xl">
-              <SectionLabel>Roadmap</SectionLabel>
-              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                ATIAA est actuellement en phase de structuration.
-              </h2>
-            </Reveal>
-
-            <div className="mt-9 grid gap-5 lg:grid-cols-4">
-              {content.roadmap.map((step: RoadmapPhase, index) => (
-                <RoadmapColumn key={step.phase} step={step} index={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="contact" className="bg-white py-20 sm:py-24">
-          <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.84fr_1.16fr] lg:px-12">
-            <Reveal className="max-w-[34rem]">
-              <SectionLabel>Contact</SectionLabel>
-              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
-                Deux chemins pour rejoindre la dynamique.
-              </h2>
-              <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
-                Que vous souhaitiez rejoindre l’alliance ou devenir partenaire fondateur, ATIAA
-                ouvre un cadre de contact simple et crédible.
-              </p>
-
-              <div className="mt-6 space-y-3">
-                <a
-                  href="#contact"
-                  className="group block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-4 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:bg-[#f6f5ef] hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42 transition-colors duration-300 group-hover:text-black/56">
-                      Je veux rejoindre ATIAA
-                    </p>
-                    <span aria-hidden="true" className="text-sm text-black/34 transition duration-300 group-hover:translate-x-1 group-hover:text-black/56">
-                      -&gt;
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
-                    Pour contribuer, apprendre, participer aux programmes ou intégrer les projets.
-                  </p>
-                </a>
-                <a
-                  href="#partenaires"
-                  className="group block rounded-[1.75rem] border border-black/10 bg-[#faf9f4] px-6 py-4 transition duration-300 hover:-translate-y-0.5 hover:border-black/18 hover:bg-[#f6f5ef] hover:shadow-[0_18px_38px_rgba(17,17,17,0.05)]"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42 transition-colors duration-300 group-hover:text-black/56">
-                      Je veux devenir partenaire fondateur
-                    </p>
-                    <span aria-hidden="true" className="text-sm text-black/34 transition duration-300 group-hover:translate-x-1 group-hover:text-black/56">
-                      -&gt;
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-black/62 transition-colors duration-300 group-hover:text-black/72">
-                    Pour soutenir une plateforme d’activation concrète de l’IA appliquée au Togo.
-                  </p>
-                </a>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.08}>
-              <ContactForm />
-            </Reveal>
-          </div>
-        </section>
-      </main>
+      <main>{children}</main>
 
       <footer className="border-t border-black/10 bg-[#faf9f5] py-10">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[1.1fr_0.8fr_0.9fr] lg:px-12">
@@ -1063,13 +735,13 @@ export default function Homepage({ content }: HomepageProps) {
 
           <div className="grid gap-2 text-sm text-black/62">
             {content.footerLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
                 href={link.href}
                 className="inline-flex items-center gap-2 transition duration-300 hover:translate-x-0.5 hover:text-black"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -1081,5 +753,790 @@ export default function Homepage({ content }: HomepageProps) {
         </div>
       </footer>
     </div>
+  );
+}
+
+function HomepageOverview({ content }: SitePageProps) {
+  return (
+    <>
+      <section id="accueil" className="border-b border-black/10 bg-white">
+        <div className="mx-auto max-w-[1520px] lg:grid lg:min-h-[calc(100svh-80px)] lg:grid-cols-[0.86fr_1.14fr]">
+          <Reveal className="flex items-center px-6 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14 xl:py-16">
+            <div className="max-w-[35rem]">
+              <SectionLabel>
+                {content.brand.status} — {content.brand.location}
+              </SectionLabel>
+              <p className="mt-4 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-black/42">
+                {content.brand.name}
+              </p>
+              <h1 className="mt-4 max-w-[10.5ch] text-[2.85rem] font-medium leading-[0.95] tracking-[-0.07em] text-black sm:text-[4rem] lg:text-[5rem]">
+                L’alliance qui transforme l’IA en usages concrets au Togo
+              </h1>
+              <p className="mt-5 max-w-[32rem] text-base leading-7 text-black/64 sm:text-[1.02rem] sm:leading-8">
+                ATIAA fédère fondateurs, experts, organisations et partenaires pour démontrer,
+                former et déployer l’IA appliquée, à partir de Lomé.
+              </p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
+                <ActionLink href="/partenaires" label="Devenir partenaire" tone="secondary" />
+              </div>
+
+              <div className="mt-8 border-t border-black/10 pt-4">
+                <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+                  Écosystème mobilisé
+                </p>
+                <div className="mt-4 flex flex-wrap gap-x-5 gap-y-3 text-sm text-black/60">
+                  {content.trustRoles.map((role) => (
+                    <div key={role} className="flex items-center gap-2.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-black/32" />
+                      <span>{role}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal className="group relative min-h-[23rem] overflow-hidden border-t border-black/10 transition duration-300 sm:min-h-[29rem] lg:min-h-0 lg:border-l lg:border-t-0">
+            <Image
+              src={content.imagery.hero.src}
+              alt={content.imagery.hero.alt}
+              fill
+              priority
+              sizes="(min-width: 1024px) 55vw, 100vw"
+              className="object-cover object-[center_24%] grayscale contrast-[1.16] brightness-[0.86] transition duration-700 group-hover:scale-[1.025] group-hover:contrast-[1.2]"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.28))] transition duration-500 group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.34))]" />
+            <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1.5 text-[0.68rem] font-medium uppercase tracking-[0.18em] text-black/62 backdrop-blur transition duration-300 group-hover:-translate-y-0.5 group-hover:bg-white/94 sm:left-5 sm:top-5">
+              Alliance en structuration
+            </div>
+            <div className="absolute bottom-5 left-5 right-5 max-w-[22rem] rounded-[1.5rem] border border-white/18 bg-black/50 px-4 py-4 text-white backdrop-blur-sm transition duration-300 group-hover:-translate-y-0.5 group-hover:border-white/24 group-hover:bg-black/56 sm:bottom-6 sm:left-6 sm:right-6 sm:max-w-[24rem] sm:px-5 sm:py-5">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.2em] text-white/60">
+                Vue de terrain
+              </p>
+              <p className="mt-2 text-sm leading-6 text-white/86 sm:mt-3 sm:text-base sm:leading-7">
+                Une plateforme qui rapproche les acteurs, structure les démonstrations et rend
+                l’IA appliquée visible et transmissible.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f7f6f1]">
+        <div className="mx-auto grid max-w-7xl gap-6 px-6 sm:px-8 lg:grid-cols-4 lg:gap-0 lg:px-12">
+          {content.stats.map((item, index) => (
+            <StatColumn key={item.label} item={item} index={index} />
+          ))}
+        </div>
+      </section>
+
+      <section id="about-overview" className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.98fr_1.02fr] lg:items-center lg:px-12">
+          <Reveal className="order-2 lg:order-1">
+            <ImagePanel
+              image={content.imagery.why}
+              className="aspect-[11/10] sm:aspect-[16/10] lg:h-[32rem]"
+              objectClassName="object-[center_32%]"
+              label="À propos"
+            />
+          </Reveal>
+
+          <Reveal className="order-1 lg:order-2">
+            <div className="max-w-[34rem]">
+              <SectionLabel>{content.pageIntros.about.label}</SectionLabel>
+              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+                {content.pageIntros.about.title}
+              </h2>
+              <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+                {content.statements.why}
+              </p>
+              <div className="mt-8 border-l-2 border-black pl-5 sm:pl-6">
+                <p className="text-[1.55rem] font-medium leading-tight tracking-[-0.04em] text-black sm:text-[2rem]">
+                  {content.statements.activation}
+                </p>
+              </div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-[1.65rem] border border-black/10 bg-[#faf9f4] p-5">
+                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+                    Mission
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-black/62">{content.statements.mission}</p>
+                </div>
+                <div className="rounded-[1.65rem] border border-black/10 bg-[#faf9f4] p-5">
+                  <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+                    Vision
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-black/62">{content.statements.vision}</p>
+                </div>
+              </div>
+              <div className="mt-6">
+                <ActionLink href="/about" label="Découvrir l’alliance" tone="secondary" />
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section id="programmes-overview" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
+          <Reveal className="lg:sticky lg:top-28 lg:self-start">
+            <SectionLabel>{content.pageIntros.programmes.label}</SectionLabel>
+            <h2 className="mt-4 max-w-[11ch] text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              {content.pageIntros.programmes.title}
+            </h2>
+            <p className="mt-5 max-w-lg text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              {content.pageIntros.programmes.description}
+            </p>
+            <div className="mt-8">
+              <ImagePanel
+                image={content.imagery.programmes}
+                className="aspect-[15/10] sm:aspect-[4/3]"
+                objectClassName="object-center"
+                label="Formats prioritaires"
+              />
+            </div>
+            <div className="mt-8">
+              <ActionLink href="/programmes" label="Voir tous les programmes" tone="secondary" />
+            </div>
+          </Reveal>
+
+          <div className="border-t border-black/10">
+            {content.programmes.slice(0, 3).map((programme, index) => (
+              <ProgrammeRow key={programme.title} programme={programme} index={index} />
+            ))}
+            <div className="rounded-[1.65rem] border border-black/10 bg-white p-5 mt-4">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+                Secteurs ciblés
+              </p>
+              <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-sm text-black/62">
+                {content.sectors.map((sector) => (
+                  <span key={sector} className="inline-flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black/30" />
+                    {sector}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="projets-overview" className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-3xl">
+              <SectionLabel>{content.pageIntros.projets.label}</SectionLabel>
+              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+                {content.pageIntros.projets.title}
+              </h2>
+            </div>
+            <ActionLink href="/projets" label="Voir les projets" tone="secondary" />
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {content.projects.map((project) => (
+              <CompactProjectCard key={project.name} project={project} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="adhesion-overview" className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="max-w-3xl">
+              <SectionLabel>{content.pageIntros.adhesion.label}</SectionLabel>
+              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+                {content.pageIntros.adhesion.title}
+              </h2>
+            </div>
+            <ActionLink href="/adhesion" label="Voir les niveaux d’adhésion" tone="secondary" />
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {content.membershipTiers.map((tier) => (
+              <MembershipTeaser key={tier.title} tier={tier} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="partenaires-overview" className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:px-12">
+          <Reveal className="max-w-[34rem]">
+            <SectionLabel>{content.pageIntros.partenaires.label}</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              {content.pageIntros.partenaires.title}
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              {content.pageIntros.partenaires.description}
+            </p>
+            <div className="mt-6 rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
+                Lecture exécutive
+              </p>
+              <p className="mt-3 text-[1.5rem] font-medium leading-tight tracking-[-0.04em] text-white sm:text-[1.6rem]">
+                {content.statements.support}
+              </p>
+            </div>
+            <div className="mt-6">
+              <ActionLink href="/partenaires" label="Voir la page partenaires" tone="secondary" />
+            </div>
+          </Reveal>
+
+          <div className="overflow-hidden rounded-[2rem] border border-black/10 bg-[#faf9f4]">
+            {content.supportPoints.slice(0, 3).map((point, index) => (
+              <Reveal
+                key={point}
+                delay={index * 0.04}
+                className={cn(
+                  "group grid gap-4 px-6 py-4 transition duration-300 hover:bg-black/[0.02] sm:grid-cols-[52px_1fr] sm:px-7",
+                  index > 0 && "border-t border-black/10"
+                )}
+              >
+                <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/52">
+                  {String(index + 1).padStart(2, "0")}
+                </div>
+                <p className="max-w-2xl text-base leading-6 text-black/72 transition-colors duration-300 group-hover:text-black/84">
+                  {point}
+                </p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="contact-overview" className="bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.84fr_1.16fr] lg:px-12">
+          <Reveal className="max-w-[34rem]">
+            <SectionLabel>{content.pageIntros.contact.label}</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              {content.pageIntros.contact.title}
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              {content.pageIntros.contact.description}
+            </p>
+            <div className="mt-6">
+              <ActionLink href="/contact" label="Ouvrir la page contact" tone="secondary" />
+            </div>
+          </Reveal>
+
+          <div className="space-y-3">
+            {content.contactPaths.map((path) => (
+              <ContactPathCard key={path.title} path={path} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default function Homepage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <HomepageOverview content={content} />
+    </SiteFrame>
+  );
+}
+
+export function AboutPage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
+          <PageLead
+            intro={content.pageIntros.about}
+            actions={
+              <>
+                <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
+                <ActionLink href="/contact" label="Nous contacter" tone="secondary" />
+              </>
+            }
+          />
+          <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] p-6 sm:p-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+              Repères d’alliance
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {content.stats.map((item) => (
+                <div key={item.label} className="border-t border-black/10 pt-4">
+                  <p className="text-[1.45rem] font-medium tracking-[-0.05em] text-black">
+                    {item.value}
+                  </p>
+                  <p className="mt-2 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/42">
+                    {item.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.98fr_1.02fr] lg:items-center lg:px-12">
+          <div className="max-w-[34rem]">
+            <SectionLabel>Pourquoi ATIAA</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              L’intérêt pour l’IA progresse, mais l’exécution reste encore trop limitée.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              {content.statements.why}
+            </p>
+            <div className="mt-8 border-l-2 border-black pl-5 sm:pl-6">
+              <p className="text-[1.55rem] font-medium leading-tight tracking-[-0.04em] text-black sm:text-[2rem]">
+                {content.statements.activation}
+              </p>
+            </div>
+          </div>
+          <ImagePanel
+            image={content.imagery.why}
+            className="aspect-[11/10] sm:aspect-[16/10] lg:h-[34rem]"
+            objectClassName="object-[center_32%]"
+            label="Adoption concrète"
+          />
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:px-12">
+          <Reveal className="max-w-[34rem] space-y-8">
+            <div>
+              <SectionLabel>Mission, vision, piliers</SectionLabel>
+              <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[2.9rem]">
+                Une plateforme d’exécution pour l’IA appliquée.
+              </h2>
+            </div>
+            <div className="border-t border-black/10 pt-5">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+                Mission
+              </p>
+              <p className="mt-3 text-base leading-7 text-black/72 sm:text-lg sm:leading-8">
+                {content.statements.mission}
+              </p>
+            </div>
+            <div className="border-t border-black/10 pt-5">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+                Vision
+              </p>
+              <p className="mt-3 text-base leading-7 text-black/72 sm:text-lg sm:leading-8">
+                {content.statements.vision}
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            <div className="border-t border-black/10">
+              {content.pillars.map((pillar, index) => (
+                <div
+                  key={pillar}
+                  className={cn(
+                    "grid gap-3 border-b border-black/10 py-4 sm:grid-cols-[64px_1fr]",
+                    index === 0 && "pt-0"
+                  )}
+                >
+                  <div className="text-sm font-medium tracking-[0.04em] text-black/34">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="text-[1.18rem] font-medium tracking-[-0.03em] text-black sm:text-[1.24rem]">
+                      {pillar}
+                    </p>
+                    <span className="h-2.5 w-2.5 rounded-full bg-black/18" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
+          <div className="max-w-[34rem]">
+            <SectionLabel>Gouvernance et confiance</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              Une gouvernance lisible, neutre et pensée pour l’intérêt collectif.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              {content.pageIntros.about.description}
+            </p>
+            <div className="mt-6 rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
+                Principe de confiance
+              </p>
+              <p className="mt-3 text-[1.5rem] font-medium leading-tight tracking-[-0.04em] text-white sm:text-[1.65rem]">
+                {content.statements.trust}
+              </p>
+            </div>
+            <div className="mt-8">
+              <ImagePanel
+                image={content.imagery.governance}
+                className="aspect-[15/10] sm:aspect-[16/9]"
+                objectClassName="object-center"
+                label="Confiance et coordination"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-black/10 bg-white px-6 py-2 sm:px-7">
+            {content.governance.map((node, index) => (
+              <GovernanceRow key={node.title} node={node} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <div className="max-w-4xl">
+            <SectionLabel>Roadmap</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              {content.statements.roadmap}
+            </h2>
+          </div>
+          <div className="mt-9 grid gap-5 lg:grid-cols-4">
+            {content.roadmap.map((step, index) => (
+              <RoadmapColumn key={step.phase} step={step} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </SiteFrame>
+  );
+}
+
+export function ProgrammesPage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
+          <PageLead
+            intro={content.pageIntros.programmes}
+            actions={
+              <>
+                <ActionLink href="/adhesion" label="Rejoindre l’alliance" />
+                <ActionLink href="/contact" label="Parler à l’équipe" tone="secondary" />
+              </>
+            }
+          />
+          <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] p-6 sm:p-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+              Repères de programme
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="border-t border-black/10 pt-4">
+                <p className="text-[1.45rem] font-medium tracking-[-0.05em] text-black">
+                  {content.programmes.length}
+                </p>
+                <p className="mt-2 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/42">
+                  formats actifs
+                </p>
+              </div>
+              <div className="border-t border-black/10 pt-4">
+                <p className="text-[1.45rem] font-medium tracking-[-0.05em] text-black">
+                  {content.sectors.length}
+                </p>
+                <p className="mt-2 text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/42">
+                  secteurs ciblés
+                </p>
+              </div>
+            </div>
+            <div className="mt-5 border-t border-black/10 pt-4">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.22em] text-black/40">
+                Priorités
+              </p>
+              <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-sm text-black/62">
+                {content.sectors.slice(0, 5).map((sector) => (
+                  <span key={sector} className="inline-flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black/30" />
+                    {sector}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-12">
+          <Reveal className="lg:sticky lg:top-28 lg:self-start">
+            <ImagePanel
+              image={content.imagery.programmes}
+              className="aspect-[15/10] sm:aspect-[4/3]"
+              objectClassName="object-center"
+              label="Démontrer et former"
+            />
+            <div className="mt-8 border-t border-black/10 pt-4">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+                Secteurs ciblés
+              </p>
+              <div className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-sm text-black/62">
+                {content.sectors.map((sector) => (
+                  <span key={sector} className="inline-flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-black/30" />
+                    {sector}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+
+          <div className="border-t border-black/10">
+            {content.programmes.map((programme, index) => (
+              <ProgrammeRow key={programme.title} programme={programme} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <div className="rounded-[2rem] border border-black/10 bg-black px-6 py-6 text-white sm:px-8 sm:py-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
+              Cadre d’activation
+            </p>
+            <p className="mt-3 max-w-3xl text-[1.45rem] font-medium leading-tight tracking-[-0.04em] sm:text-[1.65rem]">
+              Des formats conçus pour produire de la preuve, faire monter les équipes en capacité
+              et ouvrir des pilotes utiles.
+            </p>
+          </div>
+        </div>
+      </section>
+    </SiteFrame>
+  );
+}
+
+export function ProjectsPage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
+          <PageLead
+            intro={content.pageIntros.projets}
+            actions={<ActionLink href="/contact" label="Proposer un projet" tone="secondary" />}
+          />
+          <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] p-6 sm:p-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+              Cercle initial
+            </p>
+            <div className="mt-4 space-y-4">
+              {content.projects.map((project) => (
+                <div key={project.name} className="border-t border-black/10 pt-4">
+                  <p className="text-[1.35rem] font-medium tracking-[-0.04em] text-black">
+                    {project.name}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-black/62">{project.outcome}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-end lg:px-12">
+          <div className="max-w-[36rem]">
+            <SectionLabel>Cadre de lancement</SectionLabel>
+            <h2 className="mt-4 text-[2.2rem] font-medium leading-[1.02] tracking-[-0.06em] text-black sm:text-[3rem]">
+              Un premier cercle de projets pour montrer des usages appliqués, observables et transmissibles.
+            </h2>
+            <p className="mt-5 text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              Les projets fondateurs servent à installer des preuves visibles, documenter des cas
+              d’usage concrets et ouvrir l’alliance à d’autres initiatives.
+            </p>
+          </div>
+          <ImagePanel
+            image={content.imagery.projects}
+            className="aspect-[16/10] sm:aspect-[16/9]"
+            objectClassName="object-center"
+            label="Ateliers et preuves terrain"
+          />
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          {content.projects.map((project, index) => (
+            <ProjectRow key={project.name} project={project} index={index} />
+          ))}
+        </div>
+      </section>
+    </SiteFrame>
+  );
+}
+
+export function MembershipPage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
+          <PageLead
+            intro={content.pageIntros.adhesion}
+            actions={
+              <>
+                <ActionLink href="/contact" label="Ouvrir une prise de contact" />
+                <ActionLink href="/about" label="Comprendre l’alliance" tone="secondary" />
+              </>
+            }
+          />
+          <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] p-6 sm:p-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+              Niveaux d’engagement
+            </p>
+            <div className="mt-4 space-y-4">
+              {content.membershipTiers.map((tier) => (
+                <div key={tier.title} className="border-t border-black/10 pt-4">
+                  <p className="text-[1.2rem] font-medium tracking-[-0.03em] text-black">
+                    {tier.title}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-black/62">{tier.benefit}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <div className="overflow-hidden rounded-[2rem] border border-black/10 bg-white">
+            <MembershipRow tier={content.membershipTiers[0]} featured />
+            <MembershipRow tier={content.membershipTiers[1]} />
+            <MembershipRow tier={content.membershipTiers[2]} />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+          <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] px-6 py-6 sm:px-8">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
+              Principe d’engagement
+            </p>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-black/64 sm:text-lg sm:leading-8">
+              L’adhésion n’est pas un statut décoratif. Elle sert à clarifier le rôle, l’apport et
+              le niveau d’engagement de chaque acteur dans la structuration de l’alliance.
+            </p>
+          </div>
+        </div>
+      </section>
+    </SiteFrame>
+  );
+}
+
+export function PartnersPage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
+          <PageLead
+            intro={content.pageIntros.partenaires}
+            actions={
+              <>
+                <ActionLink href="/contact" label="Devenir partenaire" />
+                <ActionLink href="/projets" label="Voir les démonstrateurs" tone="secondary" />
+              </>
+            }
+          />
+          <div className="rounded-[2rem] border border-black/10 bg-[#faf9f4] p-6 sm:p-7">
+            <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/40">
+              Ce que les partenaires gagnent
+            </p>
+            <div className="mt-4 space-y-4">
+              {content.supportPoints.slice(0, 3).map((point) => (
+                <div key={point} className="border-t border-black/10 pt-4">
+                  <p className="text-sm leading-6 text-black/64">{point}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-black/10 bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.86fr_1.14fr] lg:px-12">
+          <div className="max-w-[34rem]">
+            <div className="rounded-[1.85rem] bg-black px-6 py-6 text-white sm:px-7">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-white/56">
+                Lecture exécutive
+              </p>
+              <p className="mt-3 text-[1.5rem] font-medium leading-tight tracking-[-0.04em] text-white sm:text-[1.6rem]">
+                {content.statements.support}
+              </p>
+            </div>
+            <div className="mt-8">
+              <ImagePanel
+                image={content.imagery.governance}
+                className="aspect-[15/10] sm:aspect-[16/9]"
+                objectClassName="object-center"
+                label="Partenariats et coordination"
+              />
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-[2rem] border border-black/10 bg-white">
+            {content.supportPoints.map((point, index) => (
+              <Reveal
+                key={point}
+                delay={index * 0.04}
+                className={cn(
+                  "group grid gap-4 px-6 py-4 transition duration-300 hover:bg-black/[0.02] sm:grid-cols-[52px_1fr] sm:px-7",
+                  index > 0 && "border-t border-black/10"
+                )}
+              >
+                <div className="text-sm font-medium tracking-[0.04em] text-black/34 transition-colors duration-300 group-hover:text-black/52">
+                  {String(index + 1).padStart(2, "0")}
+                </div>
+                <p className="max-w-2xl text-base leading-6 text-black/72 transition-colors duration-300 group-hover:text-black/84">
+                  {point}
+                </p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+    </SiteFrame>
+  );
+}
+
+export function ContactPage({ content }: SitePageProps) {
+  return (
+    <SiteFrame content={content}>
+      <section className="border-b border-black/10 bg-white py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:px-12">
+          <PageLead intro={content.pageIntros.contact} />
+          <div className="space-y-3">
+            {content.contactPaths.map((path) => (
+              <ContactPathCard key={path.title} path={path} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#f8f7f2] py-20 sm:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 px-6 sm:px-8 lg:grid-cols-[0.84fr_1.16fr] lg:px-12">
+          <div className="space-y-3">
+            {content.contactPaths.map((path) => (
+              <ContactPathCard key={path.title} path={path} />
+            ))}
+            <div className="rounded-[1.75rem] border border-black/10 bg-white px-6 py-5">
+              <p className="text-[0.68rem] font-medium uppercase tracking-[0.24em] text-black/42">
+                Coordination
+              </p>
+              <p className="mt-3 text-sm leading-7 text-black/62">
+                En attendant l’ouverture complète du canal d’adhésion, vous pouvez écrire à
+                <span className="font-medium text-black"> contact@atiaa.org</span>.
+              </p>
+            </div>
+          </div>
+
+          <ContactForm />
+        </div>
+      </section>
+    </SiteFrame>
   );
 }

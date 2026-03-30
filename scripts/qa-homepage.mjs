@@ -34,10 +34,10 @@ for (const viewport of viewports) {
 
   const metrics = await page.evaluate(() => {
     const hero = document.querySelector("#accueil");
-    const mission = document.querySelector("#mission");
-    const contact = document.querySelector("#contact");
+    const about = document.querySelector("#about-overview");
+    const contact = document.querySelector("#contact-overview");
     const heroRect = hero?.getBoundingClientRect();
-    const missionRect = mission?.getBoundingClientRect();
+    const aboutRect = about?.getBoundingClientRect();
     const contactRect = contact?.getBoundingClientRect();
 
     return {
@@ -45,7 +45,7 @@ for (const viewport of viewports) {
       innerHeight: window.innerHeight,
       scrollHeight: document.documentElement.scrollHeight,
       heroHeight: Math.round(heroRect?.height || 0),
-      missionTop: Math.round(missionRect?.top || 0),
+      aboutTop: Math.round(aboutRect?.top || 0),
       contactTop: Math.round(contactRect?.top || 0),
     };
   });
@@ -77,14 +77,12 @@ await reviewPage.goto(targetUrl, { waitUntil: "domcontentloaded" });
 await reviewPage.waitForTimeout(1400);
 
 const sectionSelectors = [
-  "#mission",
-  "#programmes",
-  "#projets",
-  "#adhesion",
-  "#partenaires",
-  "#gouvernance",
-  "#roadmap",
-  "#contact",
+  "#about-overview",
+  "#programmes-overview",
+  "#projets-overview",
+  "#adhesion-overview",
+  "#partenaires-overview",
+  "#contact-overview",
 ];
 
 for (const selector of sectionSelectors) {
